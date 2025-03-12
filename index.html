@@ -1,0 +1,2057 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YHDYWEJ3JH"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-YHDYWEJ3JH');
+</script>
+
+	
+  <meta charset="UTF-8">
+  <!-- Viewport for mobile scaling -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>MyLockChain - Lock Down Your Title</title>
+
+  <!-- Include Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.7.4/dist/web3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- PayPal SDK -->
+  <script src="https://www.paypal.com/sdk/js?client-id=AdY2bGMmaWQUKSvI86C3N6nMvblKzy17YWggWvPeCv9hwIyVdjTGnLj8xrOkLxaXD9xUgV9yWRexdujU&currency=USD"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Roboto', Arial, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    .navbar {
+      background-color: #1e429f;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .navbar h1 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.2;
+      color: white;
+    }
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    h1, h2, h3 {
+      color: #1e429f;
+    }
+    button {
+	  background-color: #1e429f;
+	  color: white;
+	  padding: 12px 20px;  /* Slightly increased padding */
+	  border: none;
+	  border-radius: 5px;
+	  cursor: pointer;
+	  font-weight: bold;
+	  margin-top: 15px;  /* Increased space above the button */
+	  margin-bottom: 15px;  /* Increased space below the button */
+	  display: block; /* Ensures buttons are on separate lines */
+	  width: fit-content; /* Prevents buttons from stretching */
+	}
+
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    /* Separate styling for text inputs (e.g., Enter IPFS Hash) */
+  input[type="text"] {
+    margin: 20px 0;
+    padding: 10px;
+    width: calc(100% - 22px);
+    box-sizing: border-box;
+  }
+  
+  /* Separate styling for file inputs (e.g., Choose File button) */
+  input[type="file"] {
+    margin: 20px 0;
+    padding: 10px;
+    width: auto; /* allow the browser to size it naturally */
+    box-sizing: border-box;
+    background-color: darkorange;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  /* Override for specific buttons to use dark orange */
+  #uploadBtn,
+  #registerButton {
+    background-color: darkorange !important;
+  }
+    #hashOutput {
+      word-break: break-word;
+      margin: 20px 0;
+      color: #1e429f;
+    }
+    #receipt {
+      display: none;
+      background-color: #e6f7ff;
+      border: 2px solid #1e429f;
+      padding: 15px;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+    #parcelResult {
+      background: #fafafa; border: 1px solid #ddd;
+      padding: 10px; margin-top: 10px; max-height: 300px; overflow: auto;
+      font-family: monospace; font-size: 0.9em;
+    }
+    
+    .footer {
+      text-align: center;
+      margin-top: 50px;
+      color: #777;
+    }
+    #retrievedLink {
+      display: none;
+      color: #1e429f;
+      text-decoration: underline;
+      margin-top: 10px;
+    }
+
+    /* Collapsible / Hidden sections (if you still have them) */
+    .hidden-section {
+      margin-top: 20px;
+      padding: 15px;
+      background: #fffcee;
+      border: 1px solid #f7daa3;
+      border-radius: 5px;
+      display: none;
+    }
+
+  .ipfs-section {
+  height: 200px; /* Set fixed height */
+  margin-top: 30px;
+  padding: 20px;
+  background-image: url('https://raw.githubusercontent.com/Lpierzina/MyTitleLock1/main/ISFFDOC%20(1).jpg');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  position: relative;
+  border-radius: 5px;
+  color: white;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+  z-index: 1;
+	   // background: rgba(0, 0, 0, 0.15) !important; /* Reduce overlay darkness */
+}
+
+
+/* Ensure overlay does NOT block background image */
+.ipfs-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+ 
+  z-index: 0;
+  border-radius: 5px;
+  pointer-events: none;
+}
+
+/* Ensure text stays above the overlay */
+.ipfs-section h3{
+  color: white; /* Change title color to white */
+  font-size: 1.8em; /* Slightly bigger font size */
+}
+.ipfs-section p{
+  font-size: 1.2em; /* Increase the text size slightly */
+  color: #ffffff !important;  /* Ensures text stays white */
+  font-weight: bold;          /* Makes text more readable */
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8); /* Adds a black outline */
+}
+.ipfs-section button {
+  position: relative;
+  z-index: 1;
+}
+
+/* Optional: Adjust button styles */
+.ipfs-section button {
+  background-color: #ff5722; /* Contrasting button color */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.ipfs-section button:hover {
+  background-color: #e64a19; /* Darker shade for hover effect */
+}
+	  
+.step-image-section {
+    height: 200px; /* Fixed height */
+    margin-top: 20px; /* Adds spacing above */
+    background-image: url('https://raw.githubusercontent.com/Lpierzina/MyTitleLock1/main/Comp%2021.jpg'); /* Replace with correct image */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 5px;
+    position: relative;
+}
+
+/* Optional: Add an overlay effect for better visibility */
+.step-image-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3); /* Slight dark overlay */
+    border-radius: 5px;
+}
+
+.step-image-section img {
+  width: auto;
+  height: 100%;
+  object-fit: cover;
+}
+	  
+	.wallet-background-section {
+    height: 600px; /* Fixed height */
+    margin-top: 20px; /* Adds spacing above */
+    margin-bottom: 20px; /* Adds spacing below */
+  background-image: url('https://raw.githubusercontent.com/Lpierzina/MyTitleLock1/main/Comp%2060-3.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 5px;
+    position: relative;
+}
+
+/* Optional: Add an overlay effect */
+.wallet-background-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.2); /* Slight dark overlay */
+    border-radius: 5px;
+}
+
+	  .shade-box {
+  background: #e0e0e0; /* Darker gray for better contrast */
+  padding: 15px;
+  margin-top: 30px;
+  border-radius: 5px;
+  border: 1px solid #b0b0b0; /* Adds a subtle border */
+  box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.2); /* Soft shadow effect */
+}
+
+
+
+
+    /* Gwei Meter Styles */
+    .gwei-meter {
+      margin: 15px 0;
+    }
+    .gwei-meter p {
+      margin: 5px 0;
+      font-weight: bold;
+    }
+    .meter-bar {
+      position: relative;
+      width: 100%;
+      height: 20px;
+      background-color: #ccc;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .meter-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 0%;
+      height: 100%;
+      background-color: green;
+      transition: width 0.8s ease, background-color 0.8s ease;
+    }
+
+    /* Spinner Overlay */
+    #loadingOverlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    .spinner {
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #1e429f;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 15px;
+    }
+    @keyframes spin {
+      0%   { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+   /* Media Query for Mobile */
+    @media (max-width: 768px) {
+      .container {
+        width: auto;
+        margin: 10px;
+        box-shadow: none;
+        border-radius: 0;
+        padding: 15px;
+      }
+      .navbar {
+        padding: 10px;
+      }
+      .navbar h1 {
+        font-size: 20px;
+      }
+      button {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+    input[type="file"] {
+    max-width: 250px;
+    display: inline-block;
+  }
+    }
+  </style>
+</head>
+
+<body>
+<div class="navbar">
+    <h1>MyLockChain - Lock Down Your Title</h1>
+</div>
+
+<div class="container">
+
+    <!-- Intro / Summary -->
+    <h2>Welcome to MyLockChain</h2>
+	
+	
+    <p>
+      Manage and verify title deeds and important documents securely using blockchain and IPFS technology. 
+        By uploading a title deed or any PDF document, we generate a unique "hash" for the document, 
+        which acts like a digital fingerprint. This hash is stored securely on the 
+        blockchain, ensuring tamper-proof authenticity. The hashing process is a 
+        one-way mathematical function that converts your document into a fixed 
+        string of characters, making it impossible to recreate the original document 
+        from the hash. This ensures that your document is both private and secure, 
+      while allowing easy verification of its integrity.</p>
+	
+	<p>
+    **No technical skills required** – Just upload your document, let MyLockChain handle the security, and relax knowing your records are safe and verifiable anytime. Walk through the 6 easy steps below.
+</p>
+	
+  <!-- "How to Use" button + hidden 6 steps -->
+  <button onclick="toggleSection('howToUseSection')">How to Use MyLockChain</button>
+  <div id="howToUseSection" style="display:none; margin-top:30px;">
+    <!-- 6-step instructions from your code -->
+  <h2>How to Use MyLockChain</h2>
+
+  <h3>Step 1: Prepare Your Document</h3> 
+  <p>
+    <strong>Gather Your PDF (or other file).</strong><br/>
+    - Choose the file you want to protect (e.g., a property deed).<br/>
+    - Make sure it’s in a supported format (usually PDF).<br/>
+    - Have it ready to upload in the next step.
+  </p>
+
+ <h3>Step 2: Pin Your Document on IPFS</h3>
+<p>
+  <strong>Upload &amp; Hash Document.</strong><br/>
+  - Click “Upload &amp; Hash Document” to pin the file on IPFS.<br/>
+  - <strong>Pinning</strong> means we keep a copy of your file on IPFS indefinitely, 
+    so it’s always available—even if your computer is offline.<br/>
+  - <em>Why?</em> Your document is now decentralized and tamper-evident—any change 
+    produces a new IPFS hash, revealing any forgery.
+</p>
+<p>
+  <strong>Pinning Fees &amp; File Size Limits:</strong><br/>
+  - Files up to 0.5MB: <strong>Free</strong><br/>
+  - 0.5MB &ndash; 5MB: <strong>$1</strong><br/>
+  - 5MB &ndash; 20MB: <strong>$2</strong><br/>
+  - 20MB &ndash; 50MB: <strong>$5</strong><br/>
+  - <em>Note:</em> Files over 50MB aren’t allowed. You’ll see a PayPal payment 
+    prompt if your file is above 0.5MB.
+	
+</p>
+<p>
+  <em>Why Pin?</em> Without pinning, your file might be garbage-collected if no node 
+  hosts it. Pinning ensures permanence in the decentralized network.
+</p>
+
+
+  <h3>Step 3: Install &amp; Fund Your Wallet</h3>
+<p>
+  <strong>Set Up MetaMask or Coinbase Wallet.</strong><br/>
+  - Download MetaMask (mobile or browser extension) or the Coinbase Wallet app.<br/>
+  - Securely back up your secret recovery phrase in multiple safe places.<br/>
+  - Add a small amount of ETH to cover blockchain gas fees on the Ethereum mainnet.
+</p>
+<p>
+  <em>Why?</em> MyLockChain uses smart contracts on Ethereum. Your wallet address will 
+  hold ownership of the on-chain registration for your documents, 
+  ensuring only <strong>you</strong> can record or prove authenticity.
+</p>
+
+
+  <h3>Step 4: Connect to MyLockChain</h3>
+  <p>
+    <strong>Connect Your Wallet to the dApp.</strong><br/>
+    - Open MyLockChain and click “Connect Wallet.”<br/>
+    - Approve in MetaMask to allow the dApp to interact with your address.<br/>
+    - <em>Why?</em> This lets you register your IPFS hash on the Ethereum blockchain under your control.
+  </p>
+
+  <h3>Step 5: Register the Document Hash on Ethereum</h3>
+  <p>
+    <strong>Record on the Blockchain.</strong><br/>
+    - Pay the required gas fee to store your document’s hash on-chain.<br/>
+    - A tamper-proof record is created—any attempt to modify the file changes its IPFS hash, 
+      invalidating the on-chain record.<br/>
+    - <em>Why?</em> This ensures a permanent, unalterable proof of authenticity.
+  </p>
+
+  <h3>Step 6: Save Your Transaction Receipt &amp; IPFS Hash</h3>
+  <p>
+    <strong>Keep Your Receipt &amp; Hash Safe.</strong><br/>
+    - You’ll get a transaction receipt with a unique transaction hash.<br/>
+    - Store it in a safe place. It proves exactly when your file was pinned and recorded on-chain.<br/>
+    - If you or anyone needs to verify authenticity later, just compare the file’s hash to the one on Ethereum.
+  </p>
+</div>
+	
+
+
+    <!-- Buttons to show/hide the hidden sections -->
+    <div class="toggle-buttons">
+        <button onclick="toggleSection('whyStoreSection')">Why Store Documents on MyLockChain?</button>
+        <button onclick="toggleSection('ipfsIntroSection')">Introducing IPFS</button>
+    </div>
+	<p style="font-style: italic; color: #666; margin-top: 10px;">
+  Note: Follow the orange buttons for the required steps; the blue buttons are optional.
+</p>
+
+    <!-- Collapsible Section 1: Why Store Documents? -->
+    <div id="whyStoreSection" class="hidden-section">
+        <h3>Why Store Documents on MyLockChain?</h3>
+        <h4>Prevent Tampering &amp; Fraud</h4>
+        <p>
+            By hashing your file and storing that hash on the blockchain, you create 
+            an unchangeable proof that the document existed exactly as-is at the time 
+            of registration. If anyone edits the document, the hash no longer matches—instantly 
+            revealing any forgery.
+        </p>
+        <h4>Decentralized &amp; Always Accessible</h4>
+        <p>
+            Traditional storage can fail if a single server goes down or a company closes. 
+            But IPFS spreads files across many computers worldwide. Even if one “node” is offline, 
+            others keep the file available. Your important records stay safe and globally accessible.
+        </p>
+        <h4>Privacy &amp; Security</h4>
+        <p>
+            <strong>Privacy:</strong> Only the file’s hash goes onto the blockchain—not the 
+            actual file. This means no one can read your document just by looking at the 
+            blockchain record.
+        </p>
+        <p>
+            <strong>Security:</strong> Because IPFS uses cryptographic hashes, any small 
+            change creates a new hash. This prevents hidden alterations or data manipulation.
+        </p>
+        <h4>Lower Costs</h4>
+        <p>
+            Storing large files on a centralized service can be expensive, but with IPFS, 
+            you pay primarily for what you choose to “pin.” Our fee structure ensures 
+            you pay only for the file sizes you actually upload—nothing more.
+        </p>
+        <h4>Future-Proof for Legal Needs</h4>
+        <p>
+            In a dispute, you can produce your tamper-proof, time-stamped hash from the 
+            blockchain and retrieve the exact file from IPFS. This level of immutability 
+            is invaluable for title deeds, contracts, insurance documents, or any record 
+            requiring legal certainty.
+        </p>
+        <h4>Easy Setup with Your Wallet</h4>
+        <p>
+            MyLockChain integrates directly with MetaMask or Coinbase Wallet. One click 
+            connects your wallet, and a small ETH fee registers your file’s hash on the 
+            blockchain. It’s as simple as uploading your document and clicking 
+            “Register on Blockchain.”
+      </p>
+        <h4>How It All Works</h4>
+        <p>
+            <strong>Upload Document</strong> &rarr; We generate a unique hash using a 
+            one-way function.<br/>
+            <strong>Store on IPFS</strong> &rarr; Your file is distributed across a peer-to-peer network, 
+            ensuring resilient, censorship-proof access.<br/>
+            <strong>Register on Blockchain</strong> &rarr; The hash is permanently recorded, 
+            creating a proof of existence. No central authority can alter or remove it.
+        </p>
+        <h4>Start Protecting Your Documents Now</h4>
+        <p>
+            With MyLockChain, your documents are safer, always retrievable, and legally verifiable. 
+            Why trust a single server or paper record when you can harness the power of decentralization? 
+            Upload today, and experience peace of mind knowing your titles, deeds, or critical records 
+            are truly locked down.
+      </p>
+    </div>
+
+    <!-- Collapsible Section 2: Introducing IPFS -->
+    <div id="ipfsIntroSection" class="hidden-section">
+        <h3>Introducing IPFS: Safe &amp; Decentralized Document Storage</h3>
+        <p>
+            <strong>What Is IPFS?</strong><br/>
+            IPFS (InterPlanetary File System) is a global, peer-to-peer file network that breaks your file 
+            into small pieces and stores them across many computers worldwide. Instead of depending on a 
+            single server or company, your file is spread out and always accessible.
+        </p>
+        <h4>Why It’s Safe</h4>
+        <ul>
+            <li><strong>Redundant &amp; Decentralized:</strong> No single point of failure—if one node goes down,
+                other nodes still have your file.</li>
+            <li><strong>Content-Based Addressing:</strong> Every file is located by its unique cryptographic hash.
+                If anyone changes even one letter in your file, the hash changes, exposing tampering.</li>
+            <li><strong>Immutable Storage:</strong> Since each file fragment is verified against its hash, no one
+                can alter it without creating a brand-new hash. This makes your documents effectively tamper-proof.</li>
+        </ul>
+        <h4>Try It for Free (Up to 0.5MB)</h4>
+        <p>
+            MyLockChain allows free uploads for files under 0.5MB. Upload a small document, 
+            see how the hash and IPFS storage work, and experience the benefits of decentralized 
+            storage—all at no charge!
+      </p>
+        <h4>Secure Registration with Blockchain &amp; PayPal</h4>
+        <p>
+            <strong>Blockchain Registration:</strong> We store your document’s unique hash on the blockchain 
+            for a tamper-proof record. No one—not even us—can alter it after it’s recorded.
+        </p>
+        <p>
+            <strong>PayPal-Enabled:</strong> For files larger than 0.5MB, we charge a small fee (based on file size)
+            to cover IPFS pinning and blockchain costs. You can easily pay using PayPal, a secure, globally recognized 
+            payment method. Once confirmed, we finalize your IPFS upload and registration on the blockchain.
+        </p>
+        <h4>How It Works in 3 Easy Steps</h4>
+        <ol>
+            <li><strong>Upload:</strong> Select your PDF and click “Upload &amp; Hash.” Files under 0.5MB are free; for
+                larger files, you can pay with PayPal.</li>
+            <li><strong>Register:</strong> We record the hash on the blockchain, creating a tamper-proof record of ownership.</li>
+            <li><strong>Verify:</strong> Anyone can re-hash the file and compare it to the on-chain record. If they match,
+                the file is authentic.</li>
+        </ol>
+        <h4>Why Trust MyLockChain?</h4>
+        <ul>
+            <li><strong>User-Friendly:</strong> We handle the hashing and registration. No deep blockchain knowledge needed.</li>
+            <li><strong>Affordable:</strong> Pay only for the exact storage you need. Under 0.5MB is free!</li>
+            <li><strong>Flexible Payments:</strong> We support ETH transaction fees and PayPal for bigger files—no crypto required.</li>
+            <li><strong>Future-Proof:</strong> IPFS + blockchain ensures long-term, censorship-resistant availability.</li>
+        </ul>
+        <p>
+            <strong>Ready to Protect Your Documents?</strong><br/>
+            - Give It a Try: Upload a small file (0.5MB or less) for free.<br/>
+            - Secure Larger Documents: Pay via PayPal for bigger files.<br/>
+            - Rest Easy: Your files remain immutable and verifiable—today, tomorrow, or years down the line.
+        </p>
+    </div>
+
+    <!-- Step 1 Section (File + Maricopa) -->
+  <div class="shade-box">
+
+<h3>Step 1: Prepare Your Document</h3>
+    <p>
+  Choose the file you want to protect. Supported file types include:
+  <ul>
+    <li>PDF files (.pdf)</li>
+    <li>Text files (.txt)</li>
+    <li>Solidity source files (.sol)</li>
+    <li>Images (.jpg, .jpeg, .png)</li>
+    <li>Videos (.mp4)</li>
+    <!-- Add more types here if needed -->
+  </ul>
+  When you upload a file, it will be stored on IPFS (InterPlanetary File System), a decentralized storage network that distributes your file across many computers, ensuring it remains available and resistant to censorship. At the same time, a unique cryptographic hash is generated from the file’s contents. This hash acts as a digital fingerprint, guaranteeing the file’s integrity—any change to the file will result in a different hash, so you can later verify that the file hasn’t been tampered with.
+</p>
+    <!-- Updated File Input for multiple file types -->
+<input type="file" id="fileInput" accept=".pdf,.txt,.sol,.jpg,.jpeg,.png,.mp4" />
+
+    <p id="fileNameOutput"></p>
+<p>If you own property in Maricopa, see info below.</p>
+    <!-- Maricopa Lookup toggle -->
+    <button onclick="toggleSection('maricopaSection')">
+      Maricopa County Parcel Lookup
+    </button>
+    
+</div>
+
+  <!-- This entire block is hidden by default -->
+<div id="maricopaSection" style="display:none;">
+  <h2>Maricopa Parcel Lookup and IPFS Integration</h2>
+  <p>
+    While MyLockChain is a worldwide platform for securing title deeds, we also offer a direct integration 
+    with the Maricopa County Assessor's system in Arizona, USA. If you own property in Maricopa County, 
+    you can enter your APN to retrieve detailed assessor records on your parcel—complete with valuations, 
+    sketches, and official county document links.
+  </p>
+
+  <!-- 1) APN Lookup -->
+  <div>
+    <h3>Lookup a Parcel (APN)</h3>
+    <p>
+      <strong>What Is an APN?</strong> An APN (Assessor’s Parcel Number) is a unique code assigned by 
+      the county assessor to identify each property. You can usually find your APN on your property tax 
+      statement, deed paperwork, or online assessor records.
+    </p>
+    <p>
+      <em>Note:</em> If you do not have a Maricopa County APN, the direct lookup below will not apply. 
+      However, you can still use MyLockChain to securely store and verify deeds from anywhere in the world, 
+      just without the Maricopa integration.
+    </p>
+
+    <input type="text" id="apnInput" placeholder="e.g. 123-45-678" />
+    <button onclick="lookupParcel()">Lookup Parcel</button>
+    <div id="parcelActions" style="margin-top:10px; display:none;">
+      <button onclick="downloadParcelJSON()">Download JSON</button>
+      <button onclick="uploadParcelJSON()">Upload to IPFS</button>
+    </div>
+    <pre id="parcelResult"></pre>
+
+    <!-- Owner & Deed Info -->
+    <div id="ownerSection" style="display:none; margin-top:20px;">
+      <h3>Owner Details</h3>
+      <p><strong>Owner Name:</strong> <span id="ownerName"></span></p>
+      <p><strong>Deed Date:</strong> <span id="ownerDeedDate"></span></p>
+      <p><strong>Sale Price:</strong> <span id="ownerSalePrice"></span></p>
+      <p><strong>Sale Date:</strong> <span id="ownerSaleDate"></span></p>
+      <p>
+        <strong>View Deed:</strong>
+        <a id="viewDeedLink" href="#" target="_blank">Open Maricopa Recorder</a>
+      </p>
+    </div>
+	  
+	  <!-- New: Property Overview Section -->
+<div id="propertyOverview" style="display:none; margin-top:20px;">
+  <h3>Property Overview</h3>
+  <p><strong>Address:</strong> <span id="propertyAddress"></span></p>
+  <p><strong>Description:</strong> <span id="propertyDescription"></span></p>
+  <p><strong>Lot Size:</strong> <span id="lotSize"></span></p>
+  <p><strong>Section/Township/Range:</strong> <span id="sectionTownshipRange"></span></p>
+</div>
+
+<!-- New: Residential Property Data Section -->
+<div id="residentialData" style="display:none; margin-top:20px;">
+  <h3>Property Features</h3>
+  <p><strong>Construction Year:</strong> <span id="constructionYear"></span></p>
+  <p><strong>Livable Space:</strong> <span id="livableSpace"></span></p>
+  <p><strong>Number of Garages:</strong> <span id="numberOfGarages"></span></p>
+  <!-- Add additional fields as needed -->
+</div>
+
+<!-- New: Similar Properties Section -->
+<div id="similarParcels" style="display:none; margin-top:20px;">
+  <h3>Similar Properties</h3>
+  <table border="1" cellpadding="5" style="border-collapse: collapse; width: 100%;">
+    <thead>
+      <tr>
+        <th>Parcel</th>
+        <th>Land Size</th>
+        <th>Sales Price/Date</th>
+        <th>Full Cash Value</th>
+        <th>Livable SqFt</th>
+        <th>Construction Year</th>
+        <th>Situs Address</th>
+      </tr>
+    </thead>
+    <tbody id="similarParcelsBody"></tbody>
+  </table>
+</div>
+
+<!-- New: Maps and Official Documents Section -->
+<div id="mapIDs" style="display:none; margin-top:20px;">
+  <h3>Maps and Official Documents</h3>
+  <div id="parcelMaps">
+    <h4>Parcel Maps</h4>
+    <ul id="parcelMapsList"></ul>
+  </div>
+  <div id="subdivisionMaps">
+    <h4>Subdivision Maps</h4>
+    <ul id="subdivisionMapsList"></ul>
+  </div>
+  <div id="mcrMaps">
+    <h4>MCR Maps</h4>
+    <ul id="mcrMapsList"></ul>
+  </div>
+  <div id="bookMapMaps">
+    <h4>Book/Map Maps</h4>
+    <ul id="bookMapMapsList"></ul>
+  </div>
+</div>
+
+
+    <!-- Official County Links -->
+    <div id="countyLinksSection" style="display:none; margin-top:20px;">
+      <h3>Official County Links</h3>
+      <p>
+        <a id="mcrLink" href="#" target="_blank">Subdivision Map (MCR)</a> |
+        <a id="treasurerLink" href="#" target="_blank">Treasurer Tax Info</a>
+      </p>
+    </div>
+
+    <!-- Valuation Table or Chart -->
+    <div id="valuationSection" style="display:none; margin-top:20px;">
+      <h3>Valuations Over Time</h3>
+      <canvas id="valuationChart" width="400" height="200"></canvas>
+      <table id="valuationTable" border="1" cellpadding="5" style="border-collapse: collapse;">
+        <thead>
+          <tr>
+            <th>Tax Year</th>
+            <th>Full Cash Value</th>
+            <th>Limited Property Value</th>
+            <th>Legal Classification</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- Sketch Image -->
+    <div id="sketchSection" style="display:none; margin-top:20px;">
+      <h3>Parcel Sketch</h3>
+      <img id="sketchImage" alt="Parcel Sketch" style="max-width:400px; border:1px solid #ccc;" />
+    </div>
+
+    <!-- Display the IPFS Hash after uploading -->
+    <div id="parcelIpfsHash" style="color:#1e429f; margin-top:10px;"></div>
+  </div>
+</div>
+
+
+  <!-- Step 2: Pin to IPFS -->
+	<div class="shade-box">
+<h3>Step 2: Pin Your Document on IPFS</h3>
+<p>
+  <strong>Upload &amp; Hash Document.</strong><br/>
+  - Click “Upload &amp; Hash Document” to pin the file on IPFS.<br/>
+  - <strong>Pinning</strong> means we keep a copy of your file on IPFS indefinitely, 
+    so it’s always available—even if your computer is offline.<br/>
+  - <em>Why?</em> Your document is now decentralized and tamper-evident—any change 
+    produces a new IPFS hash, revealing any forgery.
+</p>
+
+<!-- Background image section -->
+<div class="ipfs-section">
+	</div>
+  <p>
+    <strong>Pinning Fees &amp; File Size Limits:</strong><br/>
+    - Files up to 0.5MB: <strong>Free</strong><br/>
+    - 0.5MB &ndash; 5MB: <strong>$1</strong><br/>
+    - 5MB &ndash; 20MB: <strong>$2</strong><br/>
+    - 20MB &ndash; 50MB: <strong>$5</strong><br/>
+    - <em>Note:</em> Files over 50MB aren’t allowed. You’ll see a PayPal payment 
+      prompt if your file is above 0.5MB.
+  </p>
+  <p>
+    <em>Why Pin?</em> Without pinning, your file might be garbage-collected if no node 
+    hosts it. Pinning ensures permanence in the decentralized network.
+  </p>
+  <!-- The "Upload and Hash Document" button -->
+  <button id="uploadBtn" onclick="handleFileAndPayment()">Upload and Hash Document</button>
+  <div id="paypal-button-container" style="display:none; margin-bottom:20px;"></div>
+  <p id="hashOutput"></p>
+
+
+
+    
+<button onclick="toggleSection('maricopaSection')">Maricopa County Parcel Lookup</button>
+<p>If you own property in Maricopa County, you can look it up here.</p>
+
+<!-- This entire block is hidden by default -->
+<div id="maricopaSection" style="display:none;">
+  
+  <h2>Maricopa Parcel Lookup &amp; IPFS Integration</h2>
+    <p>
+  While MyLockChain is a worldwide platform for securing title deeds, we also offer a direct integration 
+  with the Maricopa County Assessor's system in Arizona, USA. If you own property in Maricopa County, 
+  you can enter your APN to retrieve detailed assessor records on your parcel—complete with valuations, 
+  sketches, and official county document links. 
+</p>
+
+  <!-- 1) APN Lookup -->
+  <div>
+    <h3>Lookup a Parcel (APN)</h3>
+<p>
+  <strong>What Is an APN?</strong> An APN (Assessor’s Parcel Number) is a unique code assigned by 
+  the county assessor to identify each property. You can usually find your APN on your property tax 
+  statement, deed paperwork, or online assessor records. 
+</p>
+<p>
+  <em>Note:</em> If you do not have a Maricopa County APN, the direct lookup below will not apply. 
+  However, you can still use MyLockChain to securely store and verify deeds from anywhere in the world, 
+  just without the Maricopa integration.
+</p>
+    <input type="text" id="apnInput" placeholder="e.g. 123-45-678" />
+    <button onclick="lookupParcel()">Lookup Parcel</button>
+    <div id="parcelActions" style="margin-top:10px; display:none;">
+      <button onclick="downloadParcelJSON()">Download JSON</button>
+      <button onclick="uploadParcelJSON()">Upload to IPFS</button>
+    </div>
+    <pre id="parcelResult"></pre>
+  <!-- Owner & Deed Info -->
+<div id="ownerSection" style="display:none; margin-top:20px;">
+  <h3>Owner Details</h3>
+  <p><strong>Owner Name:</strong> <span id="ownerName"></span></p>
+  <p><strong>Deed Date:</strong> <span id="ownerDeedDate"></span></p>
+  <p><strong>Sale Price:</strong> <span id="ownerSalePrice"></span></p>
+  <p><strong>Sale Date:</strong> <span id="ownerSaleDate"></span></p>
+  <p>
+    <strong>View Deed:</strong>
+    <a id="viewDeedLink" href="#" target="_blank">Open Maricopa Recorder</a>
+  </p>
+</div>
+
+<!-- Official County Links -->
+<div id="countyLinksSection" style="display:none; margin-top:20px;">
+  <h3>Official County Links</h3>
+  <p>
+    <a id="mcrLink" href="#" target="_blank">Subdivision Map (MCR)</a> |
+    <a id="treasurerLink" href="#" target="_blank">Treasurer Tax Info</a>
+  </p>
+</div>
+
+<!-- Valuation Table or Chart -->
+<div id="valuationSection" style="display:none; margin-top:20px;">
+  <h3>Valuations Over Time</h3>
+  <!-- The new canvas for your chart -->
+  <canvas id="valuationChart" width="400" height="200"></canvas>
+  <table id="valuationTable" border="1" cellpadding="5" style="border-collapse: collapse;">
+    <thead>
+      <tr>
+        <th>Tax Year</th>
+        <th>Full Cash Value</th>
+        <th>Limited Property Value</th>
+        <th>Legal Classification</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<!-- Sketch Image -->
+<div id="sketchSection" style="display:none; margin-top:20px;">
+  <h3>Parcel Sketch</h3>
+  <img id="sketchImage" alt="Parcel Sketch" style="max-width:400px; border:1px solid #ccc;" />
+</div>
+
+  <!-- 2) Once you have IPFS hash of the data, you can do "Register on Blockchain" etc. -->
+  <div id="parcelIpfsHash" style="color:#1e429f; margin-top:10px;"></div>
+
+  <!-- Insert your existing IPFS/Blockchain registration code, 
+       PayPal payment flows, etc. below if you want to share the same page. -->
+</div>
+</div>
+    
+ <h3>Retrieve Title Deed</h3>
+    <input type="text" id="retrieveHash" placeholder="Enter IPFS Hash" />
+    <button onclick="retrieveDocument()">Retrieve Document</button>
+    <a id="retrievedLink" href="#" target="_blank">Download Document</a>
+</div>
+		
+		
+<!-- Step 3: Install & Fund Your Wallet -->
+<div class="shade-box">
+    <div class="wallet-section">
+        <h3>Step 3: Install &amp; Fund Your Wallet</h3>
+        
+        <p>
+            <strong>Set Up MetaMask or Coinbase Wallet.</strong><br/>
+            - Download MetaMask (mobile or browser extension) or the Coinbase Wallet app.<br/>
+            - Securely back up your secret recovery phrase in multiple safe places.<br/>
+            - Add a small amount of ETH to cover blockchain gas fees for the Ethereum mainnet.
+        </p>
+
+        <!-- ✅ Background Image Section (Between Paragraphs) -->
+        <div class="wallet-background-section"></div>
+
+        <p>
+            <em>Why?</em> MyLockChain uses smart contracts on Ethereum. Your wallet address will 
+            hold ownership of the on-chain registration for your documents, 
+            ensuring only <strong>you</strong> can record or prove authenticity.
+        </p>
+
+    </div>
+</div>
+
+	
+
+    
+  <!-- BLOCKCHAIN SECTION -->
+	<div class="shade-box">
+<div class="blockchain-section">
+    <h3>Step 4: Connect your Wallet</h3>
+
+    <!-- Example Gwei Meter -->
+    <div class="gwei-meter">
+
+      
+      <p>Current Gas Price: <span id="gasPriceDisplay">Loading...</span> Gwei</p>
+      <div class="meter-bar">
+        <div id="meterFill" class="meter-fill"></div>
+      </div>
+      <p id="gasAdvice" style="margin-top:10px; font-size:0.9em;"></p>
+    </div>
+
+    <p>
+      <em>We recommend waiting if gas is above <strong>5 Gwei</strong> 
+      to minimize fees. Transactions at higher gas can be quite costly.</em>
+    </p>
+	<p>
+  <strong>What is Gas?</strong><br/>
+  Gas is the fee you pay to process and record transactions on the Ethereum blockchain. Every time you make a transaction—such as registering your document’s hash—gas fees are required to compensate the network's miners (or validators) for validating and executing your transaction. Without gas, your transaction would not be processed, and your document would not be registered on the blockchain.
+</p>
+
+    <p>
+      A small ETH fee is required to record your document hash on the blockchain.
+      This ensures tamper-proof authenticity and makes your record publicly verifiable.
+    </p>
+
+    <h4>Connect Your Wallet</h4>
+    <button onclick="connectWallet('metamask')">Connect MetaMask</button>
+    <button onclick="connectWallet('coinbase')">Connect Coinbase Wallet</button>
+    <button onclick="disconnectWallet()">Disconnect Wallet</button>
+    <p id="walletAddress">Not connected</p>
+	
+	<p>
+  <strong>Why Use a Blockchain Wallet?</strong><br/>
+  A blockchain wallet (like MetaMask or Coinbase Wallet) securely stores your private keys and enables you to sign transactions. It is essential for:
+  <ul>
+    <li>Paying the necessary gas fees to execute transactions.</li>
+    <li>Ensuring that only you have control over your digital assets and records.</li>
+    <li>Providing a secure way to interact with decentralized applications such as MyLockChain.</li>
+  </ul>
+  By connecting your wallet, you can securely register your document’s hash on the blockchain, ensuring that your record is tamper-proof and verifiable.
+</p>
+	  </div>
+		</div>
+
+  <!-- Step 5: Register on Blockchain (Enhanced) -->
+<div class="shade-box">
+  <div class="blockchain-section">
+    <h3>Step 5: Register Your Document Hash on Ethereum</h3>
+<div id="contractAddressDisplay">Loading contract address...</div>
+
+    <p>
+      <strong>Choose Registration Method:</strong><br />
+      - Option 1: Register using PayPal (Gas fees sponsored by MyLockChain).<br/>
+      - Option 2: Register with your own wallet (Metamask).
+    </p>
+
+    <!-- Option 1: PayPal-Powered Registration Button -->
+    <button id="paypalBlockchainButton" onclick="registerWithPaypal()">
+      Register on Blockchain with PayPal
+    </button>
+
+    <!-- Option 2: Existing Metamask Registration Button -->
+    <button id="metamaskBlockchainButton" onclick="registerHashOnBlockchain()" disabled>
+      Register on Blockchain with MetaMask
+    </button>
+
+    <div id="receipt">
+      <h3>Transaction Receipt</h3>
+      <p id="receiptContent"></p>
+      <div id="qrCode" style="margin-top:10px;"></div>
+      <p style="color:red; margin-top:15px;">
+        <strong>IMPORTANT:</strong> Save or print this receipt! You will need this information and/or the QR code to verify or retrieve your document in the future.
+      </p>
+    </div>
+
+    <!-- Image Section -->
+    <div class="step-image-section"></div>
+  </div>
+</div>
+	
+	
+
+	
+	
+<!-- Step 6: Save Your Transaction Receipt & IPFS Hash -->
+	  <div class="shade-box">
+<div style="margin-top:30px;">
+    <h3>Step 6: Save Your Transaction Receipt &amp; IPFS Hash</h3>
+    <p>
+      <strong>Keep Your Receipt &amp; Hash Safe.</strong><br/>
+      - You’ll get a transaction receipt with a unique transaction hash.<br/>
+      - Store it in a safe place. It proves exactly when your file was pinned and recorded on-chain.<br/>
+      - If you or anyone needs to verify authenticity later, just compare the file’s hash to the one on Ethereum.
+    </p>
+  </div>
+    
+    <h3>Verify Title Deed</h3>
+    <button onclick="verifyDocument()">Verify Document</button>
+
+ </div>
+	</div>
+	 
+
+<!-- Spinner Overlay -->
+<div id="loadingOverlay">
+    <div class="spinner"></div>
+    <p style="color: white; font-size: 20px; text-align: center;">
+        Processing... Please wait.
+    </p>
+</div>
+  
+  <!-- Mobile Warning Banner (hidden by default) -->
+<div id="mobileWarning" style="display:none; background: #ffd700; color: #000; padding: 10px; text-align: center;">
+  For best results on mobile, use MetaMask’s in-app browser if you want to register on the blockchain.
+</div>
+
+
+<div class="footer">
+    &copy; 2024 MyLockChain. All Rights Reserved.
+</div>
+
+<script>
+    let web3;
+    let contract;
+    let account;
+    let hashHex;
+    let ipfsHash;
+    let selectedProvider;
+
+    let lastUploadedFileName = ''; // store the file name to show in receipt
+    let uploadCostUSD = 0;         // how much the user must pay based on file size
+    let fileToUpload = null;       // store the actual File object for reference
+
+    const MARICOPA_TOKEN = 'fd5916c7-4f5d-430a-9c9d-26af124e0833'; // your token
+    let currentParcelData = null;  // store the JSON result in memory
+    let currentParcelIpfsHash = null;
+
+
+    
+    // Contract ABI
+    // --- Contract Details ---
+const contractAbi = [
+  {
+    "type": "constructor",
+    "inputs": [
+      { "name": "trustedForwarder", "type": "address", "internalType": "address" }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "fee",
+    "inputs": [],
+    "outputs": [
+      { "name": "", "type": "uint256", "internalType": "uint256" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getDocumentDetails",
+    "inputs": [
+      { "name": "_hash", "type": "bytes32", "internalType": "bytes32" }
+    ],
+    "outputs": [
+      { "name": "hash", "type": "bytes32", "internalType": "bytes32" },
+      { "name": "timestamp", "type": "uint256", "internalType": "uint256" },
+      { "name": "registrant", "type": "address", "internalType": "address" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getFee",
+    "inputs": [],
+    "outputs": [
+      { "name": "", "type": "uint256", "internalType": "uint256" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "isDocumentRegistered",
+    "inputs": [
+      { "name": "_hash", "type": "bytes32", "internalType": "bytes32" }
+    ],
+    "outputs": [
+      { "name": "", "type": "bool", "internalType": "bool" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "isTrustedForwarder",
+    "inputs": [
+      { "name": "forwarder", "type": "address", "internalType": "address" }
+    ],
+    "outputs": [
+      { "name": "", "type": "bool", "internalType": "bool" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "owner",
+    "inputs": [],
+    "outputs": [
+      { "name": "", "type": "address", "internalType": "address" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "registerDocument",
+    "inputs": [
+      { "name": "_hash", "type": "bytes32", "internalType": "bytes32" }
+    ],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "renounceOwnership",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "setFee",
+    "inputs": [
+      { "name": "_newFee", "type": "uint256", "internalType": "uint256" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "transferOwnership",
+    "inputs": [
+      { "name": "", "type": "address", "internalType": "address" }
+    ],
+    "outputs": [],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "trustedForwarder",
+    "inputs": [],
+    "outputs": [
+      { "name": "", "type": "address", "internalType": "address" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "withdrawFees",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "event",
+    "name": "DocumentRegistered",
+    "inputs": [
+      { "name": "hash", "type": "bytes32", "indexed": true, "internalType": "bytes32" },
+      { "name": "registrant", "type": "address", "indexed": true, "internalType": "address" },
+      { "name": "timestamp", "type": "uint256", "indexed": false, "internalType": "uint256" }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "OwnershipTransferred",
+    "inputs": [
+      { "name": "previousOwner", "type": "address", "indexed": true, "internalType": "address" },
+      { "name": "newOwner", "type": "address", "indexed": true, "internalType": "address" }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "error",
+    "name": "OwnableInvalidOwner",
+    "inputs": [
+      { "name": "owner", "type": "address", "internalType": "address" }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "OwnableUnauthorizedAccount",
+    "inputs": [
+      { "name": "account", "type": "address", "internalType": "address" }
+    ]
+  }
+];
+
+        const contractAddress = '0x1f43a19e3DA761D630c2E38316678b919F33F2a0';
+
+    /* Etherscan Gas Price with your API key */
+  const ETHERSCAN_API_KEY = "RSHDHJ1JEJ42DJDR5B994R62R52JUPYZIP";
+  const GAS_URL = `https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=${ETHERSCAN_API_KEY}`;
+
+  document.addEventListener('DOMContentLoaded', function() {
+  const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  if (isMobile) {
+    document.getElementById('mobileWarning').style.display = 'block';
+  }
+});
+
+
+  async function fetchGasPrice() {
+    try {
+      const resp = await fetch(GAS_URL);
+      const data = await resp.json();
+      if (data.status === "1") {
+        // Etherscan returns: SafeGasPrice, ProposeGasPrice, FastGasPrice
+        const proposeGasPrice = parseFloat(data.result.ProposeGasPrice);
+        document.getElementById("gasPriceDisplay").textContent = proposeGasPrice.toFixed(1);
+
+        // Update the meter fill (0 to 100% scale)
+        // For demonstration, we'll clamp the meter between 0 and 30 Gwei
+        let clamp = proposeGasPrice;
+        if (clamp > 30) clamp = 30; 
+        const percentage = (clamp / 30) * 100;
+        const meterFill = document.getElementById("meterFill");
+        meterFill.style.width = percentage + "%";
+
+        // Color logic: < 5 => green, 5-15 => orange, > 15 => red
+        let color = "green";
+        let advice = "Gas is quite low! Good time to transact.";
+        if (proposeGasPrice > 15) {
+          color = "red";
+          advice = "Gas is high. You may want to wait.";
+        }
+        else if (proposeGasPrice > 5) {
+          color = "orange";
+          advice = "Gas is moderate. Consider waiting if you want cheaper fees.";
+        }
+
+        meterFill.style.backgroundColor = color;
+        document.getElementById("gasAdvice").textContent = advice;
+      } else {
+        document.getElementById("gasPriceDisplay").textContent = "Error fetching data";
+      }
+    } catch (error) {
+      console.error("Error fetching gas price:", error);
+      document.getElementById("gasPriceDisplay").textContent = "Network Error";
+    }
+  }
+
+  // Fetch gas price on load, and every 60s
+  fetchGasPrice();
+  setInterval(fetchGasPrice, 60000);
+
+
+    // 1) Connect Wallet
+    async function connectWallet(wallet) {
+        if (wallet === 'metamask') {
+            if (window.ethereum && window.ethereum.isMetaMask) {
+                selectedProvider = window.ethereum;
+            } else {
+                alert('MetaMask is not installed. Please install MetaMask and try again.');
+                return;
+            }
+        } else if (wallet === 'coinbase') {
+            const coinbaseWallet = new CoinbaseWalletSDK({
+                appName: 'LockChain',
+                appLogoUrl: 'https://yourapp.com/logo.png',
+                darkMode: false
+            });
+            const coinbaseProvider = coinbaseWallet.makeWeb3Provider();
+            selectedProvider = coinbaseProvider;
+        } else {
+            alert('Unsupported wallet selected');
+            return;
+        }
+
+        try {
+            web3 = new Web3(selectedProvider);
+            await selectedProvider.request({ method: 'eth_requestAccounts' });
+            const accounts = await web3.eth.getAccounts();
+            account = accounts[0];
+            document.getElementById('walletAddress').innerText = 'Connected: ' + account;
+			contract = new web3.eth.Contract(contractAbi, contractAddress);
+
+            // Check network
+            await checkNetwork();
+            // Fetch and display fee
+            await displayCurrentFee();
+
+            console.log('Connected account:', account);
+        } catch (error) {
+            console.error('Error connecting to wallet:', error);
+            alert('Error connecting to wallet.');
+        }
+    }
+
+    // 2) Disconnect Wallet
+    function disconnectWallet() {
+        if (selectedProvider && selectedProvider.close) {
+            selectedProvider.close();
+        }
+        selectedProvider = null;
+        web3 = null;
+        account = null;
+        document.getElementById('walletAddress').innerText = 'Not connected';
+        alert('Wallet disconnected');
+    }
+
+    // 3) Display Current Fee (on the smart contract side)
+    async function displayCurrentFee() {
+        try {
+            const feeInWei = await contract.methods.getFee().call();
+            const feeInEth = web3.utils.fromWei(feeInWei, 'ether');
+
+            const feeNotice = document.createElement('p');
+            feeNotice.id = 'feeNotice';
+            feeNotice.innerText =
+                `A small fee of ${feeInEth} ETH is required to register your document on the blockchain.`;
+
+            const container = document.querySelector('.container');
+            container.appendChild(feeNotice);
+        } catch (error) {
+            console.error('Error fetching current fee:', error);
+            alert('Error fetching current fee from the contract.');
+        }
+    }
+
+      // Toggles for Hidden Sections
+    function toggleSection(sectionId) {
+      const section = document.getElementById(sectionId);
+      if (section.style.display === "none" || section.style.display === "") {
+        section.style.display = "block";
+      } else {
+        section.style.display = "none";
+      }
+    }
+
+
+    // Loading Overlay
+    function toggleLoadingOverlay(show) {
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        if (loadingOverlay) {
+            loadingOverlay.style.display = show ? 'flex' : 'none';
+        }
+    }
+	
+	async function registerWithPaypal() {
+    if (!hashHex) {
+        alert('You must first upload and hash your document (Step 2).');
+        return;
+    }
+
+    const container = document.getElementById('paypalBlockchainContainer');
+    container.innerHTML = ''; // clear previous buttons
+
+    paypal.Buttons({
+        createOrder: function(data, actions) {
+            return actions.order.create({
+                purchase_units: [{ amount: { value: '5.00' } }] // Adjust as needed
+            });
+        },
+        onApprove: function(data, actions) {
+            return actions.order.capture().then(async function(details) {
+                alert('Payment successful! Processing blockchain registration...');
+
+                try {
+                    const response = await fetch('https://your-relay-server.com/relay', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            documentHash: hashHex,
+                            userAddress: account,
+                            paymentDetails: details
+                        })
+                    });
+
+                    const relayResult = await response.json();
+                    if (relayResult.success) {
+                        generateRelayReceipt(relayResult.transactionHash);
+                    } else {
+                        throw new Error(relayResult.error);
+                    }
+                } catch (err) {
+                    console.error('Relay transaction failed:', err);
+                    alert('Blockchain registration failed: ' + err.message);
+                }
+            });
+        },
+        onCancel: function() {
+            alert('Payment cancelled.');
+        },
+        onError: function(err) {
+            console.error('PayPal error:', err);
+            alert('PayPal payment encountered an error.');
+        }
+    }).render('#paypalBlockchainContainer');
+}
+
+
+// Updated generateRelayReceipt function to handle relay-based tx
+async function generateRelayReceipt(txHash) {
+  const receiptHTML = `
+    <strong>File Name:</strong> ${lastUploadedFileName}<br>
+    <strong>IPFS Hash:</strong> ${ipfsHash}<br>
+    <strong>Blockchain Transaction:</strong>
+    <a href="https://etherscan.io/tx/${txHash}" target="_blank">${txHash}</a>
+  `;
+
+  document.getElementById('receiptContent').innerHTML = receiptHTML;
+  document.getElementById('receipt').style.display = 'block';
+
+  // Generate QR code for IPFS retrieval link
+  const ipfsLink = `https://gateway.pinata.cloud/ipfs/${ipfsHash}`;
+  new QRCode(document.getElementById('qrCode'), ipfsLink);
+}
+
+/*****************************************************************
+  1) LOOKUP PARCEL
+*****************************************************************/
+async function lookupParcel() {
+  const apn = document.getElementById('apnInput').value.trim();
+  if (!apn) {
+    alert('Please enter a valid APN (e.g. 123-45-678).');
+    return;
+  }
+
+  currentParcelData = null;
+  document.getElementById('parcelResult').textContent = '';
+  document.getElementById('parcelIpfsHash').textContent = '';
+  document.getElementById('parcelActions').style.display = 'none';
+
+  // Hide sections until we have valid data
+  document.getElementById('ownerSection').style.display = 'none';
+  document.getElementById('countyLinksSection').style.display = 'none';
+  document.getElementById('valuationSection').style.display = 'none';
+  document.getElementById('sketchSection').style.display = 'none';
+
+  try {
+    const url = `https://polar-stream-23993-43b80ccd3a73.herokuapp.com/maricopa/parcel?apn=${apn}`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Proxy error: ${response.status} ${response.statusText}`);
+    }
+    const data = await response.json();
+
+    // 1) Display raw JSON for debugging
+    currentParcelData = data;
+    document.getElementById('parcelResult').textContent = JSON.stringify(data, null, 2);
+    document.getElementById('parcelActions').style.display = 'inline-block';
+
+    // 2) Parse & Display Owner Info
+    if (data.Owner) {
+      const ownerObj = data.Owner;
+      document.getElementById('ownerName').textContent = ownerObj.Ownership || 'N/A';
+      document.getElementById('ownerDeedDate').textContent = ownerObj.DeedDate || 'N/A';
+      document.getElementById('ownerSalePrice').textContent = ownerObj.SalePrice || 'N/A';
+      document.getElementById('ownerSaleDate').textContent = ownerObj.SaleDate || 'N/A';
+
+      // Link to official deed
+      if (data.DeedTransitionUrl) {
+        document.getElementById('viewDeedLink').href = data.DeedTransitionUrl;
+      }
+
+      document.getElementById('ownerSection').style.display = 'block';
+    }
+	  // --- New Section: Property Overview ---
+  if (data.PropertyAddress || data.PropertyDescription || data.LotSize || data.SectionTownshipRange) {
+    document.getElementById('propertyAddress').innerText = data.PropertyAddress || 'N/A';
+    document.getElementById('propertyDescription').innerText = data.PropertyDescription || 'N/A';
+    document.getElementById('lotSize').innerText = data.LotSize || 'N/A';
+    document.getElementById('sectionTownshipRange').innerText = data.SectionTownshipRange || 'N/A';
+    document.getElementById('propertyOverview').style.display = 'block';
+  }
+
+  // --- New Section: Residential Property Data ---
+  if (data.ResidentialPropertyData) {
+    const rpd = data.ResidentialPropertyData;
+    document.getElementById('constructionYear').innerText = rpd.ConstructionYear || 'N/A';
+    document.getElementById('livableSpace').innerText = rpd.LivableSpace || 'N/A';
+    document.getElementById('numberOfGarages').innerText = rpd.NumberOfGarages || 'N/A';
+    document.getElementById('residentialData').style.display = 'block';
+  }
+
+  // --- New Section: Similar Parcels ---
+  if (data.SimilarParcels && data.SimilarParcels.length > 0) {
+    const tbody = document.getElementById('similarParcelsBody');
+    tbody.innerHTML = ''; // Clear any existing rows
+    data.SimilarParcels.forEach(parcel => {
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td>' + (parcel.Parcel || 'N/A') + '</td>' +
+        '<td>' + (parcel.LandSize || 'N/A') + '</td>' +
+        '<td>' + (parcel.SalesPriceDate || 'N/A') + '</td>' +
+        '<td>' + (parcel.FullCashValue || 'N/A') + '</td>' +
+        '<td>' + (parcel.LivableSqFootage || 'N/A') + '</td>' +
+        '<td>' + (parcel.ConstructionYear || 'N/A') + '</td>' +
+        '<td>' + (parcel.SitusAddress || 'N/A') + '</td>';
+      tbody.appendChild(tr);
+    });
+    document.getElementById('similarParcels').style.display = 'block';
+  }
+
+  // --- New Section: MapIDs Information ---
+  if (data.MapIDs) {
+    // Function to populate a list given a key in MapIDs and an element ID for the list
+    function populateMapList(mapKey, listId) {
+      if (data.MapIDs[mapKey] && data.MapIDs[mapKey].length > 0) {
+        const list = document.getElementById(listId);
+        list.innerHTML = '';
+        data.MapIDs[mapKey].forEach(mapItem => {
+          const li = document.createElement('li');
+          li.innerHTML = '<a href="' + mapItem.Url + '" target="_blank">' +
+            mapItem.FileName + ' (Updated: ' + mapItem.UpdateDate + ')</a>';
+          list.appendChild(li);
+        });
+      }
+    }
+    populateMapList("Parcel Maps", "parcelMapsList");
+    populateMapList("Subdivision Maps", "subdivisionMapsList");
+    populateMapList("MCR Maps", "mcrMapsList");
+    populateMapList("Book/Map Maps", "bookMapMapsList");
+    document.getElementById('mapIDs').style.display = 'block';
+  }
+
+    // 3) Official County Links
+    if (data.McrTransitionUrl || data.TreasurersTransitionUrl) {
+      if (data.McrTransitionUrl) {
+        document.getElementById('mcrLink').href = data.McrTransitionUrl;
+      }
+      if (data.TreasurersTransitionUrl) {
+        document.getElementById('treasurerLink').href = data.TreasurersTransitionUrl;
+      }
+      document.getElementById('countyLinksSection').style.display = 'block';
+    }
+
+    // 4) Valuations
+    if (Array.isArray(data.Valuations) && data.Valuations.length > 0) {
+      const tbody = document.querySelector('#valuationTable tbody');
+      tbody.innerHTML = ''; // clear any old rows
+
+      data.Valuations.forEach(val => {
+        const tr = document.createElement('tr');
+        // TaxYear, FullCashValue, LimitedPropertyValue, LegalClassification
+        const tdYear = document.createElement('td');
+        tdYear.textContent = val.TaxYear || 'N/A';
+        const tdFCV = document.createElement('td');
+        tdFCV.textContent = val.FullCashValue || 'N/A';
+        const tdLPV = document.createElement('td');
+        tdLPV.textContent = val.LimitedPropertyValue || 'N/A';
+        const tdClass = document.createElement('td');
+        tdClass.textContent = val.LegalClassification || 'N/A';
+
+        tr.appendChild(tdYear);
+        tr.appendChild(tdFCV);
+        tr.appendChild(tdLPV);
+        tr.appendChild(tdClass);
+        tbody.appendChild(tr);
+      });
+
+     // Now show the section
+  document.getElementById('valuationSection').style.display = 'block';
+
+  // Build arrays for the chart
+  const years = data.Valuations.map(v => v.TaxYear);
+  // Convert FullCashValue to a numeric type (default to 0 if missing)
+  const fcvValues = data.Valuations.map(v => parseInt(v.FullCashValue || '0', 10));
+
+  // Create the chart
+  const ctx = document.getElementById('valuationChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: years,
+      datasets: [{
+        label: 'Full Cash Value',
+        data: fcvValues,
+        backgroundColor: 'rgba(30, 66, 159, 0.2)',
+        borderColor: 'rgba(30, 66, 159, 1)',
+        borderWidth: 2,
+        fill: true,
+      }]
+    },
+    options: {
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+}
+
+    // 5) Parcel Sketch
+    // The JSON you provided has "Sketches.Pages[0].Sketch" as a Base64 PNG
+    if (data.Sketches && data.Sketches.Pages && data.Sketches.Pages.length > 0) {
+      const base64Sketch = data.Sketches.Pages[0].Sketch;
+      if (base64Sketch) {
+        const sketchImageEl = document.getElementById('sketchImage');
+        // Turn the base64 into a data URI for an <img>
+        sketchImageEl.src = `data:image/png;base64,${base64Sketch}`;
+        document.getElementById('sketchSection').style.display = 'block';
+      }
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Error fetching parcel data. Check console for details.');
+  }
+}
+
+
+
+/*****************************************************************
+  2) DOWNLOAD PARCEL JSON
+*****************************************************************/
+function downloadParcelJSON() {
+  if (!currentParcelData) {
+    alert('No parcel data to download. Lookup an APN first.');
+    return;
+  }
+
+  // Convert to JSON string
+  const jsonStr = JSON.stringify(currentParcelData, null, 2);
+  const blob = new Blob([jsonStr], { type: 'application/json' });
+
+  // create a temporary link
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'parcel-data.json';
+  link.click();
+
+  // clean up
+  URL.revokeObjectURL(url);
+}
+
+/*****************************************************************
+  3) UPLOAD PARCEL JSON TO IPFS
+     (Using your existing IPFS server endpoint, etc.)
+*****************************************************************/
+async function uploadParcelJSON() {
+  if (!currentParcelData) {
+    alert('No parcel data found. Please lookup an APN first.');
+    return;
+  }
+
+  // Convert data to a file-like object (Blob)
+  const jsonStr = JSON.stringify(currentParcelData, null, 2);
+  const blob = new Blob([jsonStr], { type: 'application/json' });
+
+  // create FormData & append
+  const formData = new FormData();
+  formData.append('file', blob, 'parcel-data.json');
+
+  // send to your IPFS endpoint
+  // e.g. 'https://polar-stream-23993-43b80ccd3a73.herokuapp.com/upload'
+  // or wherever your existing code references
+  try {
+    const response = await fetch('https://polar-stream-23993-43b80ccd3a73.herokuapp.com/upload', {
+      method: 'POST',
+      body: formData
+    });
+    if (!response.ok) {
+      throw new Error('Failed to upload JSON to IPFS server.');
+    }
+    const result = await response.json();
+
+    // result should have something like { IpfsHash: 'QmXYZ...' }
+    currentParcelIpfsHash = result.IpfsHash;
+    document.getElementById('parcelIpfsHash').textContent =
+      `Parcel data uploaded to IPFS! Hash: ${currentParcelIpfsHash}`;
+
+    // from here, you can let them "Register on Blockchain" if you want,
+    // or tie it into your existing code that registers a hash on chain.
+  } catch (error) {
+    console.error(error);
+    alert('Error uploading parcel JSON to IPFS. See console for details.');
+  }
+}
+
+  
+
+    // Adjusted Fee Logic: Up to 0.5MB is free, 0.5–5MB => $5, 5–20MB => $10, 20–50MB => $20
+    function determineFeeBySize(fileSizeBytes) {
+        const sizeMB = fileSizeBytes / (1024 * 1024); // convert bytes to MB
+        if (sizeMB > 50) {
+            alert('File too large! Max limit is 50 MB.');
+            return -1; // indicates an invalid file
+        }
+        if (sizeMB <= 0.5) {
+            return 0;
+        } else if (sizeMB <= 5) {
+            return 1;
+        } else if (sizeMB <= 20) {
+            return 2;
+        } else {
+            // up to 50 MB
+            return 5;
+        }
+    }
+
+    // Step 2: Called when user clicks "Upload and Hash Document"
+    async function handleFileAndPayment() {
+        const fileInput = document.getElementById('fileInput');
+        const selectedFile = fileInput.files[0];
+        if (!selectedFile) {
+            alert('Please select a PDF file first.');
+            return;
+        }
+        // Check the size + fee
+        const fee = determineFeeBySize(selectedFile.size);
+        if (fee < 0) {
+            // invalid file
+            return;
+        }
+        fileToUpload = selectedFile;    // store globally
+        uploadCostUSD = fee;           // store the cost
+
+        // Show the file name
+        lastUploadedFileName = selectedFile.name;
+        document.getElementById('fileNameOutput').innerText = `File Name: ${selectedFile.name}`;
+
+        if (fee === 0) {
+            // No PayPal payment needed => directly upload to IPFS
+            await uploadToIPFS();
+        } else {
+            // Show PayPal button for the fee
+            showPayPalButton(fee);
+        }
+    }
+
+    // Render the PayPal button for the given amount
+    function showPayPalButton(amountUSD) {
+        const paypalContainer = document.getElementById('paypal-button-container');
+        paypalContainer.style.display = 'block'; // make it visible
+
+        // Clean up any previously rendered button
+        paypalContainer.innerHTML = '';
+
+        paypal.Buttons({
+            style: {
+                layout: 'vertical',
+                color: 'gold',
+                shape: 'pill',
+                label: 'paypal'
+            },
+            createOrder: function (data, actions) {
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: { value: amountUSD.toString() }
+                    }]
+                });
+            },
+            onApprove: function (data, actions) {
+                return actions.order.capture().then(function (details) {
+                    // Payment completed => now proceed with the IPFS upload
+                    paypalContainer.style.display = 'none'; // hide PayPal UI
+                    alert('Payment successful! Uploading file to IPFS...');
+                    uploadToIPFS();
+                });
+            },
+            onCancel: function (data) {
+                alert('Payment canceled.');
+            },
+            onError: function (err) {
+                console.error('PayPal error:', err);
+                alert('An error occurred with PayPal. Check console for details.');
+            }
+        }).render('#paypal-button-container');
+    }
+
+   // 9) Actually upload to IPFS (after PayPal or if free)
+async function uploadToIPFS() {
+    if (!fileToUpload) {
+        alert('No file is selected. Please select a file first.');
+        return;
+    }
+    toggleLoadingOverlay(true);
+    try {
+        const formData = new FormData();
+        formData.append('file', fileToUpload);
+
+        const response = await fetch(
+            'https://polar-stream-23993-43b80ccd3a73.herokuapp.com/upload',
+            {
+                method: 'POST',
+                body: formData
+            }
+        );
+        if (!response.ok) {
+            throw new Error('Failed to upload file to server.');
+        }
+        const data = await response.json();
+
+        // IPFS Hash (from Pinata)
+        ipfsHash = data.IpfsHash;
+        document.getElementById('hashOutput').innerText = `IPFS Hash: ${ipfsHash}`;
+
+        // *** NEW: Show alert to remind user to save the hash
+        alert(`Please save this IPFS hash to retrieve your document later:\n\n${ipfsHash}`);
+
+        // *** NEW: Auto-fill the Retrieve Title Deed box
+        document.getElementById('retrieveHash').value = ipfsHash;
+
+        // Now do a separate SHA-256 of the file for the contract
+        const arrayBuffer = await fileToUpload.arrayBuffer();
+        const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        hashHex = '0x' + hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+        // Enable the "Register on Blockchain" button
+        document.getElementById('registerButton').disabled = false;
+		
+		 // *** NEW: Display the selected file's name in the file summary element
+        document.getElementById('fileSummary').innerText = "File to be registered: " + lastUploadedFileName;
+
+
+        // Clear out fileToUpload (not strictly necessary)
+        fileToUpload = null;
+    } catch (error) {
+        console.error('Error uploading file:', error);
+        alert('Failed to upload file. Please try again.');
+    } finally {
+        toggleLoadingOverlay(false);
+    }
+}
+
+
+    // 4) Register Hash on Blockchain
+    async function registerHashOnBlockchain() {
+        if (!web3 || !account) {
+            alert('Please connect your wallet first.');
+            return;
+        }
+        if (!hashHex) {
+            alert('Please hash a document first.');
+            return;
+        }
+
+        toggleLoadingOverlay(true);
+        try {
+            const isRegistered = await contract.methods.isDocumentRegistered(hashHex).call();
+            if (isRegistered) {
+                alert('This document is already registered.');
+                return;
+            }
+
+            // Get current fee from the contract (in ETH)
+            const feeInWei = await contract.methods.getFee().call();
+
+            // Send transaction
+            const txReceipt = await contract.methods.registerDocument(hashHex).send({
+                from: account,
+                value: feeInWei
+            });
+
+            console.log('Transaction receipt:', txReceipt);
+
+            // Optionally, get block info for an exact timestamp
+            const block = await web3.eth.getBlock(txReceipt.blockNumber);
+            const blockTimestamp = new Date(block.timestamp * 1000).toLocaleString();
+
+            // Build the IPFS gateway link
+            const ipfsLink = `https://gateway.pinata.cloud/ipfs/${ipfsHash || ''}`;
+
+            // Generate the receipt (with a QR code)
+            generateReceipt({
+                fileName: lastUploadedFileName,
+                ipfsHash: ipfsHash,
+                docHash: hashHex,
+                account: account,
+                transactionHash: txReceipt.transactionHash,
+                dateTime: blockTimestamp,
+                ipfsLink: ipfsLink
+            });
+        } catch (error) {
+            console.error('Error registering hash on blockchain:', error);
+            alert('Error registering hash on blockchain. Check console for details.');
+        } finally {
+            toggleLoadingOverlay(false);
+        }
+    }
+
+    // 5) Generate Receipt
+    function generateReceipt({
+        fileName,
+        ipfsHash,
+        docHash,
+        account,
+        transactionHash,
+        dateTime,
+        ipfsLink
+    }) {
+        const receiptContentElement = document.getElementById('receiptContent');
+        const qrCodeElement = document.getElementById('qrCode');
+
+        // Clear previous QR code
+        qrCodeElement.innerHTML = '';
+
+        const receiptHTML = `
+            <strong>File Name:</strong> ${fileName}<br>
+            <strong>IPFS Hash:</strong> ${ipfsHash}<br>
+            <strong>Document Hash (SHA-256):</strong> ${docHash}<br>
+            <strong>Registered By:</strong> ${account}<br>
+            <strong>Date and Time:</strong> ${dateTime}<br>
+            <strong>Transaction Hash:</strong>
+            <a href="https://etherscan.io/tx/${transactionHash}" target="_blank">
+                ${transactionHash}
+            </a>
+        `;
+
+        receiptContentElement.innerHTML = receiptHTML;
+        document.getElementById('receipt').style.display = 'block';
+
+        // Generate QR code for IPFS retrieval link
+        new QRCode(qrCodeElement, {
+            text: ipfsLink,
+            width: 128,
+            height: 128,
+        });
+    }
+
+    // 6) Verify Document (no change)
+    async function verifyDocument() {
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '.pdf';
+        fileInput.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) {
+                alert('No file selected.');
+                return;
+            }
+            const arrayBuffer = await file.arrayBuffer();
+            const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHexToVerify =
+                '0x' + hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+            try {
+                const isRegistered = await contract.methods
+                    .isDocumentRegistered(hashHexToVerify)
+                    .call();
+                if (isRegistered) {
+                    const details = await contract.methods
+                        .getDocumentDetails(hashHexToVerify)
+                        .call();
+                    alert(
+                        `Document is registered.\n` +
+                        `Registrant: ${details.registrant}\n` +
+                        `Timestamp: ${new Date(details.timestamp * 1000).toLocaleString()}`
+                    );
+                } else {
+                    alert('Document is not registered.');
+                }
+            } catch (error) {
+                console.error('Error verifying document:', error);
+                alert('Error verifying document.');
+            }
+        };
+        fileInput.click();
+    }
+
+   // Check Network (Ethereum Mainnet)
+async function checkNetwork() {
+    const chainId = await web3.eth.getChainId();
+    if (chainId !== 1) { // Ethereum Mainnet
+        try {
+            await selectedProvider.request({
+                method: 'wallet_switchEthereumChain',
+                params: [{ chainId: '0x1' }] // 1 in hex
+            });
+        } catch (switchError) {
+            if (switchError.code === 4902) {
+                alert('Please add the Ethereum Mainnet to your wallet.');
+            } else {
+                console.error('Error switching network:', switchError);
+            }
+        }
+    }
+}
+
+    // 10) Retrieve from IPFS (no change)
+    async function retrieveDocument() {
+        const ipfsHashVal = document.getElementById('retrieveHash').value.trim();
+        if (!ipfsHashVal) {
+            alert('Please enter an IPFS hash.');
+            return;
+        }
+        const ipfsGatewayURL = `https://gateway.pinata.cloud/ipfs/${ipfsHashVal}`;
+        const linkElement = document.getElementById('retrievedLink');
+
+        try {
+            const response = await fetch(ipfsGatewayURL, { method: 'HEAD' });
+            if (response.ok) {
+                linkElement.href = ipfsGatewayURL;
+                linkElement.style.display = 'block';
+                linkElement.innerText = 'Download Document';
+            } else {
+                alert('The document is not available on IPFS.');
+            }
+        } catch (error) {
+            console.error('Error retrieving document:', error);
+            alert('Failed to retrieve document. See console for details.');
+        }
+    }
+	
+	
+	async function loadConfig() {
+    try {
+        const response = await fetch('/config'); // Fetching from a backend endpoint
+        const config = await response.json();
+
+        // Assign variables dynamically
+        window.CONFIG = {
+            CONTRACT_ADDRESS: config.CONTRACT_ADDRESS,
+            FORWARDER_ADDRESS: config.FORWARDER_ADDRESS,
+            PAYMASTER_ADDRESS: config.PAYMASTER_ADDRESS,
+            RELAYHUB_ADDRESS: config.RELAYHUB_ADDRESS,
+            RPC_URL: config.RPC_URL,
+        };
+
+        console.log("Loaded Config:", window.CONFIG);
+
+        // Use these values in your dApp
+        document.getElementById('contractAddressDisplay').innerText = `Contract Address: ${window.CONFIG.CONTRACT_ADDRESS}`;
+    } catch (error) {
+        console.error("Error loading config:", error);
+    }
+}
+
+// Load config when the page loads
+document.addEventListener("DOMContentLoaded", loadConfig);
+
+</script>
+</body>
+</html>
