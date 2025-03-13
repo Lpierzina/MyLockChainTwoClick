@@ -2026,9 +2026,11 @@ async function checkNetwork() {
     }
 	
 	
+	const API_BASE_URL = "https://mylockchaintwoclick.herokuapp.com"; // ✅ Use your actual Heroku API URL
 	async function loadConfig() {
-    try {
-        const response = await fetch('/config'); // Fetching from a backend endpoint
+    	try {
+        	const response = await fetch(`${API_BASE_URL}/config`); // ✅ Corrected to Heroku backend
+        	const config = await response.json();
         const config = await response.json();
 
         // Assign variables dynamically
