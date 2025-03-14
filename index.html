@@ -2026,26 +2026,30 @@ async function checkNetwork() {
     }
 	
 	
-	const API_BASE_URL = "https://mylockchaintwoclick.herokuapp.com"; // ✅ Correct API base URL
+const API_BASE_URL = "https://mylockchaintwoclick-a1cbb95bdba0.herokuapp.com"; // ✅ Use your actual Heroku API URL
 
 async function loadConfig() {
     try {
-        const response = await fetch(`${API_BASE_URL}/config`); // ✅ Fetching from correct backend URL
-        const configData = await response.json(); // 🔹 Renamed 'config' to 'configData'
+        const response = await fetch(`${API_BASE_URL}/config`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const config = await response.json(); // ✅ Parse JSON properly
 
         // Assign variables dynamically
         window.CONFIG = {
-            CONTRACT_ADDRESS: configData.CONTRACT_ADDRESS,
-            FORWARDER_ADDRESS: configData.FORWARDER_ADDRESS,
-            PAYMASTER_ADDRESS: configData.PAYMASTER_ADDRESS,
-            RELAYHUB_ADDRESS: configData.RELAYHUB_ADDRESS,
-            RPC_URL: configData.RPC_URL,
+            CONTRACT_ADDRESS: config.CONTRACT_ADDRESS,
+            FORWARDER_ADDRESS: config.FORWARDER_ADDRESS,
+            PAYMASTER_ADDRESS: config.PAYMASTER_ADDRESS,
+            RELAYHUB_ADDRESS: config.RELAYHUB_ADDRESS,
+            RPC_URL: config.RPC_URL,
         };
 
         console.log("Loaded Config:", window.CONFIG);
 
         // Use these values in your dApp
-        document.getElementById('contractAddressDisplay').innerText = `Contract Address: ${window.CONFIG.CONTRACT_ADDRESS}`;
+        document.getElementById('contractAddressDisplay').innerText = 
+            `Contract Address: ${window.CONFIG.CONTRACT_ADDRESS}`;
     } catch (error) {
         console.error("Error loading config:", error);
     }
@@ -2053,6 +2057,7 @@ async function loadConfig() {
 
 // Load config when the page loads
 document.addEventListener("DOMContentLoaded", loadConfig);
+
 
 
 </script>
