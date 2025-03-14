@@ -1057,7 +1057,6 @@
     let currentParcelData = null;  // store the JSON result in memory
     let currentParcelIpfsHash = null;
 
-
     
     // Contract ABI
     // --- Contract Details ---
@@ -1065,7 +1064,11 @@ const contractAbi = [
   {
     "type": "constructor",
     "inputs": [
-      { "name": "trustedForwarder", "type": "address", "internalType": "address" }
+      {
+        "name": "trustedForwarder",
+        "type": "address",
+        "internalType": "address"
+      }
     ],
     "stateMutability": "nonpayable"
   },
@@ -1074,7 +1077,11 @@ const contractAbi = [
     "name": "fee",
     "inputs": [],
     "outputs": [
-      { "name": "", "type": "uint256", "internalType": "uint256" }
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
     ],
     "stateMutability": "view"
   },
@@ -1082,12 +1089,28 @@ const contractAbi = [
     "type": "function",
     "name": "getDocumentDetails",
     "inputs": [
-      { "name": "_hash", "type": "bytes32", "internalType": "bytes32" }
+      {
+        "name": "_hash",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
     ],
     "outputs": [
-      { "name": "hash", "type": "bytes32", "internalType": "bytes32" },
-      { "name": "timestamp", "type": "uint256", "internalType": "uint256" },
-      { "name": "registrant", "type": "address", "internalType": "address" }
+      {
+        "name": "hash",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "timestamp",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "registrant",
+        "type": "address",
+        "internalType": "address"
+      }
     ],
     "stateMutability": "view"
   },
@@ -1096,7 +1119,24 @@ const contractAbi = [
     "name": "getFee",
     "inputs": [],
     "outputs": [
-      { "name": "", "type": "uint256", "internalType": "uint256" }
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getTrustedForwarder",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "forwarder",
+        "type": "address",
+        "internalType": "address"
+      }
     ],
     "stateMutability": "view"
   },
@@ -1104,10 +1144,18 @@ const contractAbi = [
     "type": "function",
     "name": "isDocumentRegistered",
     "inputs": [
-      { "name": "_hash", "type": "bytes32", "internalType": "bytes32" }
+      {
+        "name": "_hash",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
     ],
     "outputs": [
-      { "name": "", "type": "bool", "internalType": "bool" }
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
     ],
     "stateMutability": "view"
   },
@@ -1115,10 +1163,18 @@ const contractAbi = [
     "type": "function",
     "name": "isTrustedForwarder",
     "inputs": [
-      { "name": "forwarder", "type": "address", "internalType": "address" }
+      {
+        "name": "forwarder",
+        "type": "address",
+        "internalType": "address"
+      }
     ],
     "outputs": [
-      { "name": "", "type": "bool", "internalType": "bool" }
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
     ],
     "stateMutability": "view"
   },
@@ -1127,7 +1183,11 @@ const contractAbi = [
     "name": "owner",
     "inputs": [],
     "outputs": [
-      { "name": "", "type": "address", "internalType": "address" }
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
     ],
     "stateMutability": "view"
   },
@@ -1135,7 +1195,11 @@ const contractAbi = [
     "type": "function",
     "name": "registerDocument",
     "inputs": [
-      { "name": "_hash", "type": "bytes32", "internalType": "bytes32" }
+      {
+        "name": "_hash",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
     ],
     "outputs": [],
     "stateMutability": "payable"
@@ -1151,7 +1215,11 @@ const contractAbi = [
     "type": "function",
     "name": "setFee",
     "inputs": [
-      { "name": "_newFee", "type": "uint256", "internalType": "uint256" }
+      {
+        "name": "_newFee",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
@@ -1160,18 +1228,13 @@ const contractAbi = [
     "type": "function",
     "name": "transferOwnership",
     "inputs": [
-      { "name": "", "type": "address", "internalType": "address" }
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
     ],
     "outputs": [],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "trustedForwarder",
-    "inputs": [],
-    "outputs": [
-      { "name": "", "type": "address", "internalType": "address" }
-    ],
     "stateMutability": "view"
   },
   {
@@ -1185,9 +1248,24 @@ const contractAbi = [
     "type": "event",
     "name": "DocumentRegistered",
     "inputs": [
-      { "name": "hash", "type": "bytes32", "indexed": true, "internalType": "bytes32" },
-      { "name": "registrant", "type": "address", "indexed": true, "internalType": "address" },
-      { "name": "timestamp", "type": "uint256", "indexed": false, "internalType": "uint256" }
+      {
+        "name": "hash",
+        "type": "bytes32",
+        "indexed": true,
+        "internalType": "bytes32"
+      },
+      {
+        "name": "registrant",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "timestamp",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
     ],
     "anonymous": false
   },
@@ -1195,8 +1273,18 @@ const contractAbi = [
     "type": "event",
     "name": "OwnershipTransferred",
     "inputs": [
-      { "name": "previousOwner", "type": "address", "indexed": true, "internalType": "address" },
-      { "name": "newOwner", "type": "address", "indexed": true, "internalType": "address" }
+      {
+        "name": "previousOwner",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "newOwner",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      }
     ],
     "anonymous": false
   },
@@ -1204,14 +1292,22 @@ const contractAbi = [
     "type": "error",
     "name": "OwnableInvalidOwner",
     "inputs": [
-      { "name": "owner", "type": "address", "internalType": "address" }
+      {
+        "name": "owner",
+        "type": "address",
+        "internalType": "address"
+      }
     ]
   },
   {
     "type": "error",
     "name": "OwnableUnauthorizedAccount",
     "inputs": [
-      { "name": "account", "type": "address", "internalType": "address" }
+      {
+        "name": "account",
+        "type": "address",
+        "internalType": "address"
+      }
     ]
   }
 ];
