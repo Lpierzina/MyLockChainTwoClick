@@ -1329,24 +1329,24 @@ const contractAbi = [
         alert('Wallet disconnected');
     }
 
-    // 3) Display Current Fee (on the smart contract side)
-    async function displayCurrentFee() {
-        try {
-            const feeInWei = await contract.methods.getFee().call();
-            const feeInEth = web3.utils.fromWei(feeInWei, 'ether');
+		// 3) Display Current Fee (on the smart contract side)
+		async function displayCurrentFee() {
+		try {
+			const feeInWei = await contract.methods.getFee().call();
+			const feeInEth = web3.utils.fromWei(feeInWei, 'ether');
 
-            const feeNotice = document.createElement('p');
-            feeNotice.id = 'feeNotice';
-            feeNotice.innerText =
-                `A small fee of ${feeInEth} ETH is required to register your document on the blockchain.`;
+			const feeNotice = document.getElementById('feeNotice');
+			if (feeNotice) {
+				feeNotice.innerText = `A small fee of ${feeInEth} ETH is required to register your document on the blockchain.`;
+			} else {
+				console.error("Element with ID 'feeNotice' not found.");
+			}
+		} catch (error) {
+			console.error('Error fetching current fee:', error);
+			alert('Error fetching current fee from the contract. Ensure your contract ABI and RPC URL are correct.');
+		}
+	}
 
-            const container = document.querySelector('.container');
-            container.appendChild(feeNotice);
-        } catch (error) {
-            console.error('Error fetching current fee:', error);
-            alert('Error fetching current fee from the contract.');
-        }
-    }
 
       // Toggles for Hidden Sections
     function toggleSection(sectionId) {
@@ -1374,6 +1374,12 @@ const contractAbi = [
     }
 
     const container = document.getElementById('paypalBlockchainContainer');
+    if (!container) {
+        console.error("Element with ID 'paypalBlockchainContainer' not found.");
+        alert('Error: PayPal container is missing from the page.');
+        return;
+    }
+    
     container.innerHTML = ''; // clear previous buttons
 
     paypal.Buttons({
@@ -1382,32 +1388,31 @@ const contractAbi = [
                 purchase_units: [{ amount: { value: '5.00' } }] // Adjust as needed
             });
         },
-        onApprove: function(data, actions) {
-            return actions.order.capture().then(async function(details) {
+        onApprove: async function(data, actions) {
+            try {
+                const details = await actions.order.capture();
                 alert('Payment successful! Processing blockchain registration...');
 
-                try {
-                    const response = await fetch('https://your-relay-server.com/relay', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({
-                            documentHash: hashHex,
-                            userAddress: account,
-                            paymentDetails: details
-                        })
-                    });
+                const response = await fetch('https://your-relay-server.com/relay', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        documentHash: hashHex,
+                        userAddress: account,
+                        paymentDetails: details
+                    })
+                });
 
-                    const relayResult = await response.json();
-                    if (relayResult.success) {
-                        generateRelayReceipt(relayResult.transactionHash);
-                    } else {
-                        throw new Error(relayResult.error);
-                    }
-                } catch (err) {
-                    console.error('Relay transaction failed:', err);
-                    alert('Blockchain registration failed: ' + err.message);
+                const relayResult = await response.json();
+                if (relayResult.success) {
+                    generateRelayReceipt(relayResult.transactionHash);
+                } else {
+                    throw new Error(relayResult.error);
                 }
-            });
+            } catch (err) {
+                console.error('Relay transaction failed:', err);
+                alert('Blockchain registration failed: ' + err.message);
+            }
         },
         onCancel: function() {
             alert('Payment cancelled.');
@@ -1418,6 +1423,7 @@ const contractAbi = [
         }
     }).render('#paypalBlockchainContainer');
 }
+
 
 
 // Updated generateRelayReceipt function to handle relay-based tx
@@ -1790,116 +1796,107 @@ async function uploadParcelJSON() {
     }
 
    // 9) Actually upload to IPFS (after PayPal or if free)
-async function uploadToIPFS() {
-    if (!fileToUpload) {
-        alert('No file is selected. Please select a file first.');
+	async function uploadToIPFS() {
+		if (!fileToUpload) {
+			alert('No file is selected. Please select a file first.');
+			return;
+		}
+		toggleLoadingOverlay(true);
+		try {
+			const formData = new FormData();
+			formData.append('file', fileToUpload);
+
+			const response = await fetch(
+				'https://polar-stream-23993-43b80ccd3a73.herokuapp.com/upload',
+				{
+					method: 'POST',
+					body: formData
+				}
+			);
+
+			if (!response.ok) {
+				throw new Error('Failed to upload file to server.');
+			}
+
+			const data = await response.json();
+			ipfsHash = data.IpfsHash;
+
+			const hashOutputEl = document.getElementById('hashOutput');
+			if (hashOutputEl) {
+				hashOutputEl.innerText = `IPFS Hash: ${ipfsHash}`;
+			} else {
+				console.error("Element with ID 'hashOutput' not found.");
+			}
+
+			alert(`Please save this IPFS hash to retrieve your document later:\n\n${ipfsHash}`);
+			document.getElementById('retrieveHash').value = ipfsHash;
+			document.getElementById('registerButton').disabled = false;
+		} catch (error) {
+			console.error('Error uploading file:', error);
+			alert('Failed to upload file. Please try again.');
+		} finally {
+			toggleLoadingOverlay(false);
+		}
+	}
+
+
+    // 4) Register Hash on Blockchain
+    async function registerHashOnBlockchain() {
+    if (!web3 || !account) {
+        alert('Please connect your wallet first.');
         return;
     }
+    if (!hashHex) {
+        alert('Please hash a document first.');
+        return;
+    }
+
     toggleLoadingOverlay(true);
     try {
-        const formData = new FormData();
-        formData.append('file', fileToUpload);
-
-        const response = await fetch(
-            'https://polar-stream-23993-43b80ccd3a73.herokuapp.com/upload',
-            {
-                method: 'POST',
-                body: formData
-            }
-        );
-        if (!response.ok) {
-            throw new Error('Failed to upload file to server.');
+        const isRegistered = await contract.methods.isDocumentRegistered(hashHex).call();
+        if (isRegistered) {
+            alert('This document is already registered.');
+            toggleLoadingOverlay(false);
+            return;
         }
-        const data = await response.json();
 
-        // IPFS Hash (from Pinata)
-        ipfsHash = data.IpfsHash;
-        document.getElementById('hashOutput').innerText = `IPFS Hash: ${ipfsHash}`;
+        // Ensure we are using the correct contract ABI
+        console.log("Using contract ABI:", contractAbi);
 
-        // *** NEW: Show alert to remind user to save the hash
-        alert(`Please save this IPFS hash to retrieve your document later:\n\n${ipfsHash}`);
+        // Get current fee from the contract (in ETH)
+        const feeInWei = await contract.methods.getFee().call();
 
-        // *** NEW: Auto-fill the Retrieve Title Deed box
-        document.getElementById('retrieveHash').value = ipfsHash;
+        // Send transaction
+        const txReceipt = await contract.methods.registerDocument(hashHex).send({
+            from: account,
+            value: feeInWei
+        });
 
-        // Now do a separate SHA-256 of the file for the contract
-        const arrayBuffer = await fileToUpload.arrayBuffer();
-        const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        hashHex = '0x' + hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        console.log('Transaction receipt:', txReceipt);
 
-        // Enable the "Register on Blockchain" button
-        document.getElementById('registerButton').disabled = false;
-		
-		 // *** NEW: Display the selected file's name in the file summary element
-        document.getElementById('fileSummary').innerText = "File to be registered: " + lastUploadedFileName;
+        const block = await web3.eth.getBlock(txReceipt.blockNumber);
+        const blockTimestamp = new Date(block.timestamp * 1000).toLocaleString();
 
+        const ipfsLink = `https://gateway.pinata.cloud/ipfs/${ipfsHash || ''}`;
 
-        // Clear out fileToUpload (not strictly necessary)
-        fileToUpload = null;
+        generateReceipt({
+            fileName: lastUploadedFileName,
+            ipfsHash: ipfsHash,
+            docHash: hashHex,
+            account: account,
+            transactionHash: txReceipt.transactionHash,
+            dateTime: blockTimestamp,
+            ipfsLink: ipfsLink
+        });
+
     } catch (error) {
-        console.error('Error uploading file:', error);
-        alert('Failed to upload file. Please try again.');
+        console.error('Error registering hash on blockchain:', error);
+        alert('Error registering hash on blockchain. Ensure your wallet has ETH and you are connected to the correct network.');
     } finally {
         toggleLoadingOverlay(false);
     }
 }
 
-
-    // 4) Register Hash on Blockchain
-    async function registerHashOnBlockchain() {
-        if (!web3 || !account) {
-            alert('Please connect your wallet first.');
-            return;
-        }
-        if (!hashHex) {
-            alert('Please hash a document first.');
-            return;
-        }
-
-        toggleLoadingOverlay(true);
-        try {
-            const isRegistered = await contract.methods.isDocumentRegistered(hashHex).call();
-            if (isRegistered) {
-                alert('This document is already registered.');
-                return;
-            }
-
-            // Get current fee from the contract (in ETH)
-            const feeInWei = await contract.methods.getFee().call();
-
-            // Send transaction
-            const txReceipt = await contract.methods.registerDocument(hashHex).send({
-                from: account,
-                value: feeInWei
-            });
-
-            console.log('Transaction receipt:', txReceipt);
-
-            // Optionally, get block info for an exact timestamp
-            const block = await web3.eth.getBlock(txReceipt.blockNumber);
-            const blockTimestamp = new Date(block.timestamp * 1000).toLocaleString();
-
-            // Build the IPFS gateway link
-            const ipfsLink = `https://gateway.pinata.cloud/ipfs/${ipfsHash || ''}`;
-
-            // Generate the receipt (with a QR code)
-            generateReceipt({
-                fileName: lastUploadedFileName,
-                ipfsHash: ipfsHash,
-                docHash: hashHex,
-                account: account,
-                transactionHash: txReceipt.transactionHash,
-                dateTime: blockTimestamp,
-                ipfsLink: ipfsLink
-            });
-        } catch (error) {
-            console.error('Error registering hash on blockchain:', error);
-            alert('Error registering hash on blockchain. Check console for details.');
-        } finally {
-            toggleLoadingOverlay(false);
-        }
-    }
 
     // 5) Generate Receipt
     function generateReceipt({
@@ -2057,8 +2054,6 @@ async function loadConfig() {
 
 // Load config when the page loads
 document.addEventListener("DOMContentLoaded", loadConfig);
-
-
 
 </script>
 </body>
