@@ -1895,47 +1895,58 @@ async function uploadParcelJSON() {
 
    // 9) Actually upload to IPFS (after PayPal or if free)
 	async function uploadToIPFS() {
-		if (!fileToUpload) {
-			alert('No file is selected. Please select a file first.');
-			return;
-		}
-		toggleLoadingOverlay(true);
-		try {
-			const formData = new FormData();
-			formData.append('file', fileToUpload);
+    if (!fileToUpload) {
+        alert('No file is selected. Please select a file first.');
+        return;
+    }
+    toggleLoadingOverlay(true);
+    try {
+        // STEP 1: Compute SHA-256 Hash
+        const arrayBuffer = await fileToUpload.arrayBuffer();
+        const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        hashHex = '0x' + hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        
+        // STEP 2: Upload to IPFS (no change)
+        const formData = new FormData();
+        formData.append('file', fileToUpload);
 
-			const response = await fetch(
-				'https://polar-stream-23993-43b80ccd3a73.herokuapp.com/upload',
-				{
-					method: 'POST',
-					body: formData
-				}
-			);
+        const response = await fetch(
+            'https://polar-stream-23993-43b80ccd3a73.herokuapp.com/upload',
+            {
+                method: 'POST',
+                body: formData
+            }
+        );
 
-			if (!response.ok) {
-				throw new Error('Failed to upload file to server.');
-			}
+        if (!response.ok) {
+            throw new Error('Failed to upload file to server.');
+        }
 
-			const data = await response.json();
-			ipfsHash = data.IpfsHash;
+        const data = await response.json();
+        ipfsHash = data.IpfsHash;
 
-			const hashOutputEl = document.getElementById('hashOutput');
-			if (hashOutputEl) {
-				hashOutputEl.innerText = `IPFS Hash: ${ipfsHash}`;
-			} else {
-				console.error("Element with ID 'hashOutput' not found.");
-			}
+        const hashOutputEl = document.getElementById('hashOutput');
+        if (hashOutputEl) {
+            hashOutputEl.innerText = `IPFS Hash: ${ipfsHash}`;
+        } else {
+            console.error("Element with ID 'hashOutput' not found.");
+        }
 
-			alert(`Please save this IPFS hash to retrieve your document later:\n\n${ipfsHash}`);
-			document.getElementById('retrieveHash').value = ipfsHash;
-			document.getElementById('registerButton').disabled = false;
-		} catch (error) {
-			console.error('Error uploading file:', error);
-			alert('Failed to upload file. Please try again.');
-		} finally {
-			toggleLoadingOverlay(false);
-		}
-	}
+        alert(`Please save this IPFS hash to retrieve your document later:\n\n${ipfsHash}`);
+
+        // STEP 3: Store hashHex globally and enable blockchain buttons
+        document.getElementById('retrieveHash').value = ipfsHash;
+        document.getElementById('registerButton').disabled = false;
+
+    } catch (error) {
+        console.error('Error uploading file:', error);
+        alert('Failed to upload file. Please try again.');
+    } finally {
+        toggleLoadingOverlay(false);
+    }
+}
+
 
 
     // 4) Register Hash on Blockchain
