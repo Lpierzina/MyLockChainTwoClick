@@ -1950,18 +1950,20 @@ async function uploadParcelJSON() {
 
 
     // 4) Register Hash on Blockchain
-    async function registerHashOnBlockchain() {
+   async function registerHashOnBlockchain() {
     if (!web3 || !account) {
         alert('Please connect your wallet first.');
         return;
     }
-    if (!hashHex) {
+    if (!ipfsHash) {
         alert('Please hash a document first.');
         return;
     }
 
     toggleLoadingOverlay(true);
     try {
+        const hashHex = web3.utils.keccak256(ipfsHash); // Convert IPFS hash to bytes32
+
         const isRegistered = await contract.methods.isDocumentRegistered(hashHex).call();
         if (isRegistered) {
             alert('This document is already registered.');
@@ -1969,24 +1971,27 @@ async function uploadParcelJSON() {
             return;
         }
 
-        // Ensure we are using the correct contract ABI
-        console.log("Using contract ABI:", contractAbi);
-
-        // Get current fee from the contract (in ETH)
+        // Get current fee from contract
         const feeInWei = await contract.methods.getFee().call();
 
-        // Send transaction
-        const txReceipt = await contract.methods.registerDocument(hashHex).send({
+        // Set gas parameters explicitly
+        const gasPrice = await web3.eth.getGasPrice();
+        const gasLimit = await contract.methods.registerDocument(hashHex).estimateGas({
             from: account,
             value: feeInWei
         });
 
-        console.log('Transaction receipt:', txReceipt);
+        const txReceipt = await contract.methods.registerDocument(hashHex).send({
+            from: account,
+            value: feeInWei,
+            gas: Math.floor(gasLimit * 1.2), // 20% buffer
+            gasPrice: Math.floor(gasPrice * 1.5) // 50% higher priority
+        });
 
         const block = await web3.eth.getBlock(txReceipt.blockNumber);
         const blockTimestamp = new Date(block.timestamp * 1000).toLocaleString();
 
-        const ipfsLink = `https://gateway.pinata.cloud/ipfs/${ipfsHash || ''}`;
+        const ipfsLink = `https://gateway.pinata.cloud/ipfs/${ipfsHash}`;
 
         generateReceipt({
             fileName: lastUploadedFileName,
@@ -2000,11 +2005,12 @@ async function uploadParcelJSON() {
 
     } catch (error) {
         console.error('Error registering hash on blockchain:', error);
-        alert('Error registering hash on blockchain. Ensure your wallet has ETH and you are connected to the correct network.');
+        alert('Error: ' + error.message);
     } finally {
         toggleLoadingOverlay(false);
     }
 }
+
 
 
     // 5) Generate Receipt
