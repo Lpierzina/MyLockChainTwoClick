@@ -2077,11 +2077,11 @@ async function uploadParcelJSON() {
    // Check Network (Ethereum Mainnet)
 async function checkNetwork() {
     const chainId = await web3.eth.getChainId();
-    if (chainId !== 1) { // Ethereum Mainnet
+    if (chainId !== 137) { // Polygon Mainnet
         try {
             await selectedProvider.request({
                 method: 'wallet_switchEthereumChain',
-                params: [{ chainId: '0x1' }] // 1 in hex
+                params: [{ chainId: '0x89' }] // 137 in hex Polygon mainnet
             });
         } catch (switchError) {
             if (switchError.code === 4902) {
