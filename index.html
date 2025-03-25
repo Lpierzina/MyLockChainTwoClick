@@ -1470,66 +1470,63 @@ const contractAbi = [
         }
     }
 	
-	async function registerWithPaypal() {
-    if (!hashHex) {
-        alert('You must first upload and hash your document (Step 2).');
-        return;
-    }
+	
+   async function registerWithPaypal() {
+	  if (!hashHex) {
+	    alert('You must first upload and hash your document (Step 2).');
+	    return;
+	  }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const container = document.getElementById('paypalBlockchainContainer');
-        if (!container) {
-            console.error("Element with ID 'paypalBlockchainContainer' not found.");
-            alert('Error: PayPal container is missing from the page.');
-            return;
+  const container = document.getElementById('paypalBlockchainContainer');
+  if (!container) {
+    console.error("Element with ID 'paypalBlockchainContainer' not found.");
+    alert('Error: PayPal container is missing from the page.');
+    return;
+  }
+
+  container.innerHTML = ''; // Clear any previous buttons
+
+  paypal.Buttons({
+    createOrder: function (data, actions) {
+      return actions.order.create({
+        purchase_units: [{ amount: { value: '5.00' } }]
+      });
+    },
+    onApprove: async function (data, actions) {
+      try {
+        const details = await actions.order.capture();
+        alert('Payment successful! Processing blockchain registration...');
+
+        const response = await fetch('https://lockchain-relay-server1-23453f1aa216.herokuapp.com', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            documentHash: hashHex,
+            userAddress: account,
+            paymentDetails: details
+          })
+        });
+
+        const relayResult = await response.json();
+        if (relayResult.success) {
+          generateRelayReceipt(relayResult.transactionHash);
+        } else {
+          throw new Error(relayResult.error);
         }
-
-        container.innerHTML = ''; // Clear any previous buttons
-
-        paypal.Buttons({
-            createOrder: function(data, actions) {
-                return actions.order.create({
-                    purchase_units: [{ amount: { value: '5.00' } }] // Adjust as needed
-                });
-            },
-            onApprove: async function(data, actions) {
-                try {
-                    const details = await actions.order.capture();
-                    alert('Payment successful! Processing blockchain registration...');
-
-                    const response = await fetch('https://your-relay-server.com/relay', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            documentHash: hashHex,
-                            userAddress: account,
-                            paymentDetails: details
-                        })
-                    });
-
-                    const relayResult = await response.json();
-                    if (relayResult.success) {
-                        generateRelayReceipt(relayResult.transactionHash);
-                    } else {
-                        throw new Error(relayResult.error);
-                    }
-                } catch (err) {
-                    console.error('Relay transaction failed:', err);
-                    alert('Blockchain registration failed: ' + err.message);
-                }
-            },
-            onCancel: function() {
-                alert('Payment cancelled.');
-            },
-            onError: function(err) {
-                console.error('PayPal error:', err);
-                alert('PayPal payment encountered an error.');
-            }
-        }).render('#paypalBlockchainContainer');
-    });
+      } catch (err) {
+        console.error('Relay transaction failed:', err);
+        alert('Blockchain registration failed: ' + err.message);
+      }
+    },
+    onCancel: function () {
+      alert('Payment cancelled.');
+    },
+    onError: function (err) {
+      console.error('PayPal error:', err);
+      alert('PayPal payment encountered an error.');
+    }
+  }).render('#paypalBlockchainContainer');
 }
-
-
 
 
 // Updated generateRelayReceipt function to handle relay-based tx
