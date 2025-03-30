@@ -3,6 +3,13 @@
 <head>
 	<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-YHDYWEJ3JH"></script>
+	
+// Inject the UserOp module
+<script type="module">
+  import { handlePostUploadSubmission } from './submitUserOp.js';
+  window.handlePostUploadSubmission = handlePostUploadSubmission;
+</script>
+
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -22,6 +29,9 @@
   <script src="https://cdn.jsdelivr.net/npm/web3@1.7.4/dist/web3.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@opengsn/provider/dist/gsn.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+
 
   <!-- PayPal SDK -->
   <script src="https://www.paypal.com/sdk/js?client-id=AdY2bGMmaWQUKSvI86C3N6nMvblKzy17YWggWvPeCv9hwIyVdjTGnLj8xrOkLxaXD9xUgV9yWRexdujU&currency=USD"></script>
@@ -944,8 +954,7 @@
       A small ETH fee is required to record your document hash on the blockchain.
       This ensures tamper-proof authenticity and makes your record publicly verifiable.
     </p>
-    <p id="feeNotice" style="color:#1e429f; font-weight:bold;"></p>
-
+	<p id="feeNotice" style="color:#1e429f; font-weight:bold;"></p>
 
     <h4>Connect Your Wallet</h4>
     <button onclick="connectWallet('metamask')">Connect MetaMask</button>
@@ -982,8 +991,8 @@
     <button id="paypalBlockchainButton" onclick="registerWithPaypal()">
       Register on Blockchain with PayPal
     </button>
-	  
-   <!-- Clearly identifiable PayPal container div -->
+	  <!-- Add this div below the button -->
+<!-- Clearly identifiable PayPal container div -->
 <div id="paypalBlockchainWrapper" style="margin-top: 20px;">
   <div id="paypalBlockchainContainer"></div>
 </div>
@@ -1068,258 +1077,287 @@
     // Contract ABI
     // --- Contract Details ---
 const contractAbi = [
-  {
-    "type": "constructor",
-    "inputs": [
-      {
-        "name": "trustedForwarder",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "fee",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "getDocumentDetails",
-    "inputs": [
-      {
-        "name": "_hash",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "hash",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      },
-      {
-        "name": "timestamp",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "registrant",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "getFee",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "getTrustedForwarder",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "forwarder",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "isDocumentRegistered",
-    "inputs": [
-      {
-        "name": "_hash",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "isTrustedForwarder",
-    "inputs": [
-      {
-        "name": "forwarder",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "owner",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "registerDocument",
-    "inputs": [
-      {
-        "name": "_hash",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "payable"
-  },
-  {
-    "type": "function",
-    "name": "renounceOwnership",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "setFee",
-    "inputs": [
-      {
-        "name": "_newFee",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "transferOwnership",
-    "inputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "withdrawFees",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "event",
-    "name": "DocumentRegistered",
-    "inputs": [
-      {
-        "name": "hash",
-        "type": "bytes32",
-        "indexed": true,
-        "internalType": "bytes32"
-      },
-      {
-        "name": "registrant",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "timestamp",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "OwnershipTransferred",
-    "inputs": [
-      {
-        "name": "previousOwner",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "newOwner",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "error",
-    "name": "OwnableInvalidOwner",
-    "inputs": [
-      {
-        "name": "owner",
-        "type": "address",
-        "internalType": "address"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "OwnableUnauthorizedAccount",
-    "inputs": [
-      {
-        "name": "account",
-        "type": "address",
-        "internalType": "address"
-      }
-    ]
-  }
-];
+    {
+      "inputs": [
+        {
+          "internalType": "contract IEntryPoint",
+          "name": "entryPoint_",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "error",
+          "type": "bytes"
+        }
+      ],
+      "name": "ExecuteError",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnableInvalidOwner",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "OwnableUnauthorizedAccount",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "entryPoint",
+      "outputs": [
+        {
+          "internalType": "contract IEntryPoint",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "dest",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "value",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "func",
+          "type": "bytes"
+        }
+      ],
+      "name": "execute",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address[]",
+          "name": "dest",
+          "type": "address[]"
+        },
+        {
+          "internalType": "bytes[]",
+          "name": "func",
+          "type": "bytes[]"
+        }
+      ],
+      "name": "executeBatch",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "target",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "value",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes",
+              "name": "data",
+              "type": "bytes"
+            }
+          ],
+          "internalType": "struct BaseAccount.Call[]",
+          "name": "calls",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "executeBatch",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getNonce",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "nonce",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes",
+              "name": "initCode",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes",
+              "name": "callData",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "accountGasLimits",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint256",
+              "name": "preVerificationGas",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "gasFees",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes",
+              "name": "paymasterAndData",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes",
+              "name": "signature",
+              "type": "bytes"
+            }
+          ],
+          "internalType": "struct PackedUserOperation",
+          "name": "userOp",
+          "type": "tuple"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "userOpHash",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "missingAccountFunds",
+          "type": "uint256"
+        }
+      ],
+      "name": "validateUserOp",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "validationData",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "receive"
+    }
+  ];
 
-        const contractAddress = '0x38626e2E21ff8725Eb904994aF5F2bB955536e85';
+        const contractAddress = '0xF22570437AC863b105a7BbD49979831286D8e9BE'; // erc 4337 Arbitrum address
 
     /* Etherscan Gas Price with your API key */
   const ETHERSCAN_API_KEY = "RSHDHJ1JEJ42DJDR5B994R62R52JUPYZIP";
@@ -1470,12 +1508,11 @@ const contractAbi = [
         }
     }
 	
-	
-   async function registerWithPaypal() {
-	  if (!hashHex) {
-	    alert('You must first upload and hash your document (Step 2).');
-	    return;
-	  }
+	async function registerWithPaypal() {
+  if (!hashHex) {
+    alert('You must first upload and hash your document (Step 2).');
+    return;
+  }
 
   const container = document.getElementById('paypalBlockchainContainer');
   if (!container) {
@@ -1527,6 +1564,10 @@ const contractAbi = [
     }
   }).render('#paypalBlockchainContainer');
 }
+
+
+
+
 
 
 // Updated generateRelayReceipt function to handle relay-based tx
@@ -1809,25 +1850,23 @@ async function uploadParcelJSON() {
 
   
 
-    // Adjusted Fee Logic: Up to 0.5MB is free, 0.5–5MB => $5, 5–20MB => $10, 20–50MB => $20
-    function determineFeeBySize(fileSizeBytes) {
-        const sizeMB = fileSizeBytes / (1024 * 1024); // convert bytes to MB
-        if (sizeMB > 50) {
-            alert('File too large! Max limit is 50 MB.');
-            return -1; // indicates an invalid file
-        }
-        if (sizeMB <= 0.5) {
-            return 0;
-        } else if (sizeMB <= 5) {
-            return 1;
-        } else if (sizeMB <= 20) {
-            return 2;
-        } else {
-            // up to 50 MB
-            return 5;
-        }
-    }
-
+	// 💲 Updated Fee Logic: Start charging $1 for the lowest tier	
+	function determineFeeBySize(fileSizeBytes) {
+		const sizeMB = fileSizeBytes / (1024 * 1024);
+		if (sizeMB > 50) {
+			alert('File too large! Max limit is 50 MB.');
+			return -1;
+		}
+		if (sizeMB <= 0.5) {
+			return 1; // previously 0, now $1
+		} else if (sizeMB <= 5) {
+			return 1;
+		} else if (sizeMB <= 20) {
+			return 2;
+		} else {
+			return 5;
+		}
+	}
     // Step 2: Called when user clicks "Upload and Hash Document"
     async function handleFileAndPayment() {
         const fileInput = document.getElementById('fileInput');
@@ -1858,48 +1897,54 @@ async function uploadParcelJSON() {
         }
     }
 
-    // Render the PayPal button for the given amount
-    function showPayPalButton(amountUSD) {
-        const paypalContainer = document.getElementById('paypal-button-container');
-        paypalContainer.style.display = 'block'; // make it visible
+ // 💳 Updated PayPal UI call (ensures uploadToIPFS gets triggered only after payment)
+function showPayPalButton(amountUSD) {
+    const paypalContainer = document.getElementById('paypal-button-container');
+    paypalContainer.style.display = 'block';
+    paypalContainer.innerHTML = '';
 
-        // Clean up any previously rendered button
-        paypalContainer.innerHTML = '';
+    paypal.Buttons({
+        style: {
+            layout: 'vertical',
+            color: 'gold',
+            shape: 'pill',
+            label: 'paypal'
+        },
+        createOrder: function (data, actions) {
+            return actions.order.create({
+                purchase_units: [{
+                    amount: { value: amountUSD.toString() }
+                }]
+            });
+        },
+        onApprove: function (data, actions) {
+            return actions.order.capture().then(async function (details) {
+                paypalContainer.style.display = 'none';
+                alert('Payment successful! Uploading file to IPFS...');
+                await uploadToIPFS();
+            });
+        },
+        onCancel: function () {
+            alert('Payment canceled.');
+        },
+        onError: function (err) {
+            console.error('PayPal error:', err);
+            alert('An error occurred with PayPal. Check console for details.');
+        }
+    }).render('#paypal-button-container');
+}
 
-        paypal.Buttons({
-            style: {
-                layout: 'vertical',
-                color: 'gold',
-                shape: 'pill',
-                label: 'paypal'
-            },
-            createOrder: function (data, actions) {
-                return actions.order.create({
-                    purchase_units: [{
-                        amount: { value: amountUSD.toString() }
-                    }]
-                });
-            },
-            onApprove: function (data, actions) {
-                return actions.order.capture().then(function (details) {
-                    // Payment completed => now proceed with the IPFS upload
-                    paypalContainer.style.display = 'none'; // hide PayPal UI
-                    alert('Payment successful! Uploading file to IPFS...');
-                    uploadToIPFS();
-                });
-            },
-            onCancel: function (data) {
-                alert('Payment canceled.');
-            },
-            onError: function (err) {
-                console.error('PayPal error:', err);
-                alert('An error occurred with PayPal. Check console for details.');
-            }
-        }).render('#paypal-button-container');
-    }
+// Inject the UserOp module
+const userOpScript = document.createElement('script');
+userOpScript.type = 'module';
+userOpScript.textContent = `
+  import { handlePostUploadSubmission } from './submitUserOp.js';
+  window.handlePostUploadSubmission = handlePostUploadSubmission;
+`;
+document.head.appendChild(userOpScript);
 
-   // 9) Actually upload to IPFS (after PayPal or if free)
-	async function uploadToIPFS() {
+ // Updated uploadToIPFS function with auto ERC-4337 submission after PayPal
+async function uploadToIPFS() {
     if (!fileToUpload) {
         alert('No file is selected. Please select a file first.');
         return;
@@ -1911,8 +1956,8 @@ async function uploadParcelJSON() {
         const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
         const hashArray = Array.from(new Uint8Array(hashBuffer));
         hashHex = '0x' + hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        
-        // STEP 2: Upload to IPFS (no change)
+
+        // STEP 2: Upload to IPFS
         const formData = new FormData();
         formData.append('file', fileToUpload);
 
@@ -1934,28 +1979,30 @@ async function uploadParcelJSON() {
         const hashOutputEl = document.getElementById('hashOutput');
         if (hashOutputEl) {
             hashOutputEl.innerText = `IPFS Hash: ${ipfsHash}`;
-        } else {
-            console.error("Element with ID 'hashOutput' not found.");
         }
 
-        alert(`Please save this IPFS hash to retrieve your document later:\n\n${ipfsHash}`);
+        alert(`✅ Upload complete! Your document was pinned on IPFS.\n\nIPFS Hash: ${ipfsHash}`);
 
-        // STEP 3: Store hashHex globally and enable blockchain buttons
         document.getElementById('retrieveHash').value = ipfsHash;
         document.getElementById('registerButton').disabled = false;
 
+        // 👇 Automatically register the hash on-chain using ERC-4337 sponsored tx
+        if (window.handlePostUploadSubmission) {
+            await window.handlePostUploadSubmission({ hashHex, ipfsHash });
+        } else {
+            console.warn('Submission module not found. Skipping UserOp.');
+        }
+
     } catch (error) {
         console.error('Error uploading file:', error);
-        alert('Failed to upload file. Please try again.');
+        alert('❌ Failed to upload file. Please try again.');
     } finally {
         toggleLoadingOverlay(false);
     }
 }
 
-
-
     // 4) Register Hash on Blockchain
-   async function registerHashOnBlockchain() {
+    async function registerHashOnBlockchain() {
     if (!web3 || !account) {
         alert('Please connect your wallet first.');
         return;
@@ -2016,15 +2063,17 @@ async function uploadParcelJSON() {
     }
 }
 
-async function initializeGsnProvider() {
-      console.log("Initializing GSN Provider...");
+	
+	async function initializeGsnProvider() 
+		console.log("Initializing GSN Provider...");
 
-		const gsnProvider = RelayProvider.newProvider({
-			provider: new ethers.providers.JsonRpcProvider(window.CONFIG.RPC_URL),
-			config: {
-				paymasterAddress: "CONFIG.PAYMASTER_ADDRESS"
-			}
+		const gsnProvider = new window.RelayProvider.newProvider({
+		  provider: new ethers.providers.JsonRpcProvider(window.CONFIG.RPC_URL),
+		  config: {
+			paymasterAddress: window.CONFIG.PAYMASTER_ADDRESS
+		  }
 		});
+ 
 
     await gsnProvider.init();
     
@@ -2077,6 +2126,7 @@ async function registerDocumentUsingGSN(documentHash) {
         registerHashOnBlockchain(documentHash); // Fallback to MetaMask
     }
 }
+
 
     // 5) Generate Receipt
     function generateReceipt({
@@ -2161,11 +2211,11 @@ async function registerDocumentUsingGSN(documentHash) {
    // Check Network (Ethereum Mainnet)
 async function checkNetwork() {
     const chainId = await web3.eth.getChainId();
-    if (chainId !== 137) { // Polygon Mainnet
+    if (chainId !== 1) { // Ethereum Mainnet
         try {
             await selectedProvider.request({
                 method: 'wallet_switchEthereumChain',
-                params: [{ chainId: '0x89' }] // 137 in hex Polygon mainnet
+                params: [{ chainId: '0x1' }] // 1 in hex
             });
         } catch (switchError) {
             if (switchError.code === 4902) {
@@ -2203,7 +2253,7 @@ async function checkNetwork() {
     }
 	
 	
-const API_BASE_URL = "https://mylockchaintwoclick-a1cbb95bdba0.herokuapp.com"; // ✅ Use your actual Heroku API URL
+const API_BASE_URL = "https://mylockchaintwoclick-a1cbb95bdba0.herokuapp.com"; //  Use your actual Heroku API URL
 
 async function loadConfig() {
     try {
