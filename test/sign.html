@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MetaMask Signer</title>
+</head>
+<body>
+  <h2>MetaMask Signer</h2>
+  <label>userOpHash:</label><br />
+  <input type="text" id="userOpHash" style="width: 400px" /><br /><br />
+  <button onclick="sign()">Sign with MetaMask</button>
+
+  <pre id="output"></pre>
+
+  <script>
+    async function sign() {
+      if (!window.ethereum) return alert("MetaMask not found");
+
+      const [account] = await ethereum.request({ method: "eth_requestAccounts" });
+      const userOpHash = document.getElementById("userOpHash").value.trim();
+
+      try {
+        const signature = await ethereum.request({
+          method: "personal_sign",
+          params: [userOpHash, account],
+        });
+
+        document.getElementById("output").textContent = `✅ Signature:\n${signature}`;
+        console.log("Signature:", signature);
+      } catch (err) {
+        console.error(err);
+        alert("Signing failed");
+      }
+    }
+  </script>
+</body>
+</html>
