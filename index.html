@@ -29,7 +29,7 @@
   <script src="https://cdn.jsdelivr.net/npm/web3@1.7.4/dist/web3.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@opengsn/provider/dist/gsn.min.js"></script>
+  
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 
 
@@ -2064,69 +2064,7 @@ async function uploadToIPFS() {
 }
 
 	
-	async function initializeGsnProvider() 
-		console.log("Initializing GSN Provider...");
-
-		const gsnProvider = new window.RelayProvider.newProvider({
-		  provider: new ethers.providers.JsonRpcProvider(window.CONFIG.RPC_URL),
-		  config: {
-			paymasterAddress: window.CONFIG.PAYMASTER_ADDRESS
-		  }
-		});
- 
-
-    await gsnProvider.init();
-    
-    // Use the GSN provider for your ethers.js interactions
-    window.gsnEthersProvider = new ethers.providers.Web3Provider(gsnProvider);
-    
-    console.log("GSN Provider initialized successfully!");
-}
-
-// Call the function to initialize GSN when the page loads
-document.addEventListener("DOMContentLoaded", initializeGsnProvider);
-
-async function registerDocumentUsingGSN(documentHash) {
-    if (!window.gsnEthersProvider) {
-        console.error("❌ GSN Provider not initialized. Using MetaMask instead.");
-        registerHashOnBlockchain(documentHash); // Fallback to MetaMask
-        return;
-    }
-
-    const signer = window.gsnEthersProvider.getSigner();
-    const contract = new ethers.Contract(
-        window.CONFIG.CONTRACT_ADDRESS,
-        contractAbi,
-        signer
-    );
-
-    try {
-        console.log("🔹 Checking if document is already registered...");
-        const isRegistered = await contract.isDocumentRegistered(documentHash);
-        if (isRegistered) {
-            alert("⚠️ Document already registered on blockchain!");
-            return;
-        }
-
-        console.log("🔹 Fetching required fee...");
-        const feeInWei = await contract.getFee();
-        console.log(`📌 Required fee: ${web3.utils.fromWei(feeInWei, 'ether')} ETH`);
-
-        console.log("⛽ Sending gasless transaction via GSN...");
-        const tx = await contract.registerDocument(documentHash, { value: feeInWei });
-        const receipt = await tx.wait();
-
-        console.log("✅ Transaction successful via GSN!", receipt);
-        alert(`✅ Document registered successfully!\nTransaction Hash: ${receipt.transactionHash}`);
-
-        generateRelayReceipt(receipt.transactionHash);
-    } catch (error) {
-        console.error("❌ GSN Transaction failed:", error);
-        alert("⚠️ GSN registration failed! Falling back to MetaMask...");
-        registerHashOnBlockchain(documentHash); // Fallback to MetaMask
-    }
-}
-
+	
 
     // 5) Generate Receipt
     function generateReceipt({
