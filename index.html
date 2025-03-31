@@ -1526,7 +1526,7 @@ const contractAbi = [
   paypal.Buttons({
     createOrder: function (data, actions) {
       return actions.order.create({
-        purchase_units: [{ amount: { value: '5.00' } }]
+        purchase_units: [{ amount: { value: '1.00' } }]
       });
     },
     onApprove: async function (data, actions) {
