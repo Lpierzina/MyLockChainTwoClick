@@ -2194,8 +2194,8 @@ const API_BASE_URL = "https://mylockchain-backend-7292d672afb4.herokuapp.com"; /
 
 async function loadConfig() {
   try {
-    const response = await fetch("https://your-heroku-app.herokuapp.com/config");
-    const config = await response.json();
+	  const response = await fetch(`${API_BASE_URL}/config`);    
+	  const config = await response.json();
 
     // ✅ Save ERC-4337 config globally
     window.ERC4337_CONFIG = config.ERC4337_CONFIG;
