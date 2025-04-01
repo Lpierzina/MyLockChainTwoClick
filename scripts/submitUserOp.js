@@ -7,34 +7,43 @@ import {
   packUserOp
 } from "https://cdn.jsdelivr.net/npm/@account-abstraction/utils@0.6.3/+esm"; // version-matched to v0.7 struct
 
-const ENTRY_POINT = "0xE624D5227a5EefaC396426Cf8f16E6A34294bDE0"; // Your deployed EntryPoint
-const PAYMASTER = "0x9e662d0ce3Eb47761BaC126aDFb27F714d819898";   // Your LockChainPaymaster
-const BUNDLER_RPC = "https://arb-mainnet.g.alchemy.com/v2/R3hvZ2ZEkRFc0agXhqctMfFMYym9YvMa"; // 🔑 Replace with real key
-const CONTRACT_ADDRESS = "0xF22570437AC863b105a7BbD49979831286D8e9BE"; // LockChainMeta Wallet
+const ENTRY_POINT = "0xE624D5227a5EefaC396426Cf8f16E6A34294bDE0"; // EntryPoint
+const PAYMASTER = "0x9e662d0ce3Eb47761BaC126aDFb27F714d819898"; // Paymaster
+const BUNDLER_RPC = "https://arb-mainnet.g.alchemy.com/v2/YOUR_KEY"; // Replace with your key
+const SMART_WALLET = "0xF22570437AC863b105a7BbD49979831286D8e9BE"; // OwnableLockChainMeta
+const REGISTRY_ADDRESS = "0x6C06aD114856E341540F53Cd377eF24c176034B3"; // ✅ NEW!
 
-const CONTRACT_ABI = [
-  {
-    "inputs": [{ "internalType": "bytes32", "name": "documentHash", "type": "bytes32" }],
-    "name": "registerDocument",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  }
-];
+
+const REGISTRY_ABI = [
+    "function register(bytes32 documentHash)"
+  ];
+  
+  const WALLET_ABI = [
+    "function execute(address dest, uint256 value, bytes calldata func)"
+  ];
+  
 
 export async function handlePostUploadSubmission({ hashHex, ipfsHash }) {
   try {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     await provider.send("eth_requestAccounts", []);
     const signer = provider.getSigner();
-    const sender = await signer.getAddress();
+    const sender = SMART_WALLET;
 
-    const iface = new ethers.utils.Interface(CONTRACT_ABI);
-    const callData = iface.encodeFunctionData("registerDocument", [hashHex]);
+
+    const registryIface = new ethers.utils.Interface(REGISTRY_ABI);
+const walletIface = new ethers.utils.Interface(WALLET_ABI);
+
+const innerCall = registryIface.encodeFunctionData("register", [hashHex]);
+const callData = walletIface.encodeFunctionData("execute", [REGISTRY_ADDRESS, 0, innerCall]);
+
+const wallet = new ethers.Contract(SMART_WALLET, ["function getNonce() view returns (uint256)"], provider);
+const nonce = await wallet.getNonce();
+
 
     const userOp = {
       sender: sender,
-      nonce: await provider.getTransactionCount(sender),
+      nonce: nonce,
       initCode: "0x",
       callData: callData,
       accountGasLimits: ethers.utils.hexZeroPad("0x01f400", 32), // 128k gas
