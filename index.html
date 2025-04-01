@@ -2215,14 +2215,17 @@ async function loadConfig() {
 
 // Load config when the page loads
 document.addEventListener("DOMContentLoaded", loadConfig);
-	
-	<script type="module">
+	</script>
+
+<!-- ✅ This script loads your submitUserOp.js module correctly -->
+<script type="module">
   import('/scripts/submitUserOp.js').then(module => {
     window.handlePostUploadSubmission = module.handlePostUploadSubmission;
   }).catch(err => {
     console.error("Failed to load submitUserOp.js:", err);
   });
-
 </script>
+
+	
 </body>
 </html>
