@@ -2,27 +2,24 @@
 // Create and send a sponsored ERC-4337 UserOperation via MetaMask, EntryPoint, and Paymaster
 
 import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@5.7.2/+esm";
-// import { Alchemy, Network } from "https://cdn.jsdelivr.net/npm/alchemy-sdk@latest/+esm";
-// import { getUserOpHash, packUserOp } from "https://cdn.jsdelivr.net/npm/@account-abstraction/sdk@latest/+esm";
-const { getUserOpHash, packUserOp } = window.AccountAbstractionUtils;
+import {
+  getUserOpHash,
+  packUserOp
+} from "https://cdn.jsdelivr.net/npm/@account-abstraction/sdk@latest/+esm";
 
-// version-matched to v0.7 struct
-
-const ENTRY_POINT = "0xE624D5227a5EefaC396426Cf8f16E6A34294bDE0"; // EntryPoint
-const PAYMASTER = "0x9e662d0ce3Eb47761BaC126aDFb27F714d819898"; // Paymaster
-const BUNDLER_RPC = "https://arb-mainnet.g.alchemy.com/v2/R3hvZ2ZEkRFc0agXhqctMfFMYym9YvMa"; // Replace with your key
-const SMART_WALLET = "0xF22570437AC863b105a7BbD49979831286D8e9BE"; // OwnableLockChainMeta
-const REGISTRY_ADDRESS = "0x6C06aD114856E341540F53Cd377eF24c176034B3"; // ✅ NEW!
-
+const ENTRY_POINT = "0xE624D5227a5EefaC396426Cf8f16E6A34294bDE0";
+const PAYMASTER = "0x9e662d0ce3Eb47761BaC126aDFb27F714d819898";
+const BUNDLER_RPC = "https://arb-mainnet.g.alchemy.com/v2/R3hvZ2ZEkRFc0agXhqctMfFMYym9YvMa";
+const SMART_WALLET = "0xF22570437AC863b105a7BbD49979831286D8e9BE";
+const REGISTRY_ADDRESS = "0x6C06aD114856E341540F53Cd377eF24c176034B3";
 
 const REGISTRY_ABI = [
-    "function register(bytes32 documentHash)"
-  ];
-  
-  const WALLET_ABI = [
-    "function execute(address dest, uint256 value, bytes calldata func)"
-  ];
-  
+  "function register(bytes32 documentHash)"
+];
+
+const WALLET_ABI = [
+  "function execute(address dest, uint256 value, bytes calldata func)"
+];
 
 export async function handlePostUploadSubmission({ hashHex, ipfsHash }) {
   try {
@@ -31,30 +28,36 @@ export async function handlePostUploadSubmission({ hashHex, ipfsHash }) {
     const signer = provider.getSigner();
     const sender = SMART_WALLET;
 
-
     const registryIface = new ethers.utils.Interface(REGISTRY_ABI);
-const walletIface = new ethers.utils.Interface(WALLET_ABI);
+    const walletIface = new ethers.utils.Interface(WALLET_ABI);
 
-const innerCall = registryIface.encodeFunctionData("register", [hashHex]);
-const callData = walletIface.encodeFunctionData("execute", [REGISTRY_ADDRESS, 0, innerCall]);
+    const innerCall = registryIface.encodeFunctionData("register", [hashHex]);
+    const callData = walletIface.encodeFunctionData("execute", [
+      REGISTRY_ADDRESS,
+      0,
+      innerCall
+    ]);
 
-const wallet = new ethers.Contract(SMART_WALLET, ["function getNonce() view returns (uint256)"], provider);
-const nonce = await wallet.getNonce();
-
+    const wallet = new ethers.Contract(
+      SMART_WALLET,
+      ["function getNonce() view returns (uint256)"],
+      provider
+    );
+    const nonce = await wallet.getNonce();
 
     const userOp = {
-      sender: sender,
-      nonce: nonce,
+      sender,
+      nonce,
       initCode: "0x",
-      callData: callData,
-      accountGasLimits: ethers.utils.hexZeroPad("0x01f400", 32), // 128k gas
+      callData,
+      accountGasLimits: ethers.utils.hexZeroPad("0x01f400", 32),
       preVerificationGas: ethers.utils.hexlify(60000),
-      gasFees: ethers.utils.hexZeroPad("0x100", 32), // sample max fee
+      gasFees: ethers.utils.hexZeroPad("0x100", 32),
       paymasterAndData: PAYMASTER.toLowerCase(),
       signature: "0x"
     };
 
-    const userOpHash = await getUserOpHash(userOp, ENTRY_POINT, 42161); // Arbitrum One chainId
+    const userOpHash = await getUserOpHash(userOp, ENTRY_POINT, 42161);
     const signature = await signer.signMessage(ethers.utils.arrayify(userOpHash));
     userOp.signature = signature;
 
@@ -83,10 +86,8 @@ const nonce = await wallet.getNonce();
 
     const opHash = result.result;
     console.log("✅ UserOperation submitted:", opHash);
-
     alert(`✅ Document registered with sponsored gas!\n\nUserOpHash: ${opHash}`);
 
-    // optionally store opHash, hashHex, ipfsHash somewhere
     return opHash;
   } catch (err) {
     console.error("❌ Submission failed:", err);
