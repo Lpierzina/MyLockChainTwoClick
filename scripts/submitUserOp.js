@@ -1,7 +1,4 @@
-// /scripts/submitUserOp.js
-
 (async function () {
-    // ⏳ Wait until the UMD script is fully loaded
     while (
       typeof window.AccountAbstractionUtils === "undefined" ||
       typeof window.AccountAbstractionUtils.getUserOpHash === "undefined"
@@ -12,9 +9,22 @@
     const { getUserOpHash, packUserOp } = window.AccountAbstractionUtils;
     const { ethers } = window;
   
-    window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash, userAddress }) {
-      console.log("📦 Starting ERC-4337 submission...");
+    async function retryOperation(fn, retries = 2, delay = 2000) {
+      for (let i = 0; i < retries; i++) {
+        try {
+          return await fn();
+        } catch (err) {
+          if (i < retries - 1) {
+            console.warn(`Retrying... (${i + 1})`, err.message);
+            await new Promise(res => setTimeout(res, delay));
+          } else {
+            throw err;
+          }
+        }
+      }
+    }
   
+    window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash, userAddress }) {
       const {
         ENTRY_POINT,
         SMART_WALLET,
@@ -23,27 +33,15 @@
         REGISTRY_ADDRESS
       } = window.ERC4337_CONFIG;
   
-      // Connect to bundler and wallet
       const bundler = new ethers.providers.JsonRpcProvider(BUNDLER_RPC);
       const signer = new ethers.providers.Web3Provider(window.ethereum).getSigner();
   
-      // Encode registry.register(bytes32)
-      const registryIface = new ethers.utils.Interface([
-        "function register(bytes32 hash)"
-      ]);
+      const registryIface = new ethers.utils.Interface(["function register(bytes32 hash)"]);
       const encodedCall = registryIface.encodeFunctionData("register", [hashHex]);
   
-      // Wrap in smart wallet call: execute(address,uint256,bytes)
-      const walletIface = new ethers.utils.Interface([
-        "function execute(address dest, uint256 value, bytes calldata func)"
-      ]);
-      const callData = walletIface.encodeFunctionData("execute", [
-        REGISTRY_ADDRESS,
-        0,
-        encodedCall
-      ]);
+      const walletIface = new ethers.utils.Interface(["function execute(address dest, uint256 value, bytes func)"]);
+      const callData = walletIface.encodeFunctionData("execute", [REGISTRY_ADDRESS, 0, encodedCall]);
   
-      // Get nonce and gas price
       const nonce = await bundler.getStorageAt(SMART_WALLET, 0);
       const gasPrice = await bundler.getGasPrice();
   
@@ -58,24 +56,44 @@
           gasPrice.toHexString().slice(2).padStart(64, "0"),
           32
         ),
-        paymasterAndData: PAYMASTER || "0x", // fallback to empty string if none
+        paymasterAndData: PAYMASTER || "0x",
         signature: "0x"
       };
   
       const packed = packUserOp(userOp);
       const { chainId } = await bundler.getNetwork();
       const userOpHash = await getUserOpHash(packed, ENTRY_POINT, chainId);
-  
-      // Sign using connected wallet (e.g. MetaMask)
       const signature = await signer.signMessage(ethers.utils.arrayify(userOpHash));
       userOp.signature = signature;
   
-      // Send the UserOp via eth_sendUserOperation
-      const result = await bundler.send("eth_sendUserOperation", [userOp, ENTRY_POINT]);
+      try {
+        const result = await retryOperation(() => bundler.send("eth_sendUserOperation", [userOp, ENTRY_POINT]), 2, 3000);
+        console.log("✅ Submitted via bundler:", result);
+        alert("🎉 Document registered on-chain via bundler.");
+        return result;
+      } catch (err) {
+        console.warn("❌ Bundler failed, falling back to backend server:", err.message);
   
-      console.log("✅ Submitted UserOperation:", result);
-      alert("🎉 Your document hash was registered on-chain!");
-      return result;
+        try {
+          const response = await fetch("https://mylockchain-backend-7292d672afb4.herokuapp.com/submitSignedUserOp", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userOp, signature })
+          });
+  
+          const result = await response.json();
+  
+          if (result.success) {
+            alert("🎉 Fallback successful: Document registered on-chain.");
+            return result.txHash;
+          } else {
+            throw new Error(result.error || "Fallback failed");
+          }
+        } catch (serverErr) {
+          console.error("❌ Fallback submission failed:", serverErr.message);
+          alert("❌ All attempts failed. Try again later.");
+        }
+      }
     };
   })();
   
