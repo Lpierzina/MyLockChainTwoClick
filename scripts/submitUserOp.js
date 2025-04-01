@@ -9,7 +9,7 @@ import {
 
 const ENTRY_POINT = "0xE624D5227a5EefaC396426Cf8f16E6A34294bDE0"; // Your deployed EntryPoint
 const PAYMASTER = "0x9e662d0ce3Eb47761BaC126aDFb27F714d819898";   // Your LockChainPaymaster
-const BUNDLER_RPC = "https://arb1.g.alchemy.com/v2/YOUR_ALCHEMY_KEY"; // 🔑 Replace with real key
+const BUNDLER_RPC = "https://arb-mainnet.g.alchemy.com/v2/R3hvZ2ZEkRFc0agXhqctMfFMYym9YvMa"; // 🔑 Replace with real key
 const CONTRACT_ADDRESS = "0xF22570437AC863b105a7BbD49979831286D8e9BE"; // LockChainMeta Wallet
 
 const CONTRACT_ABI = [
