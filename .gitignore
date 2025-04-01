@@ -9,7 +9,7 @@ node_modules
 /typechain
 /typechain-types
 
-/backend
+/backend/
 
 
 # solidity-coverage files
