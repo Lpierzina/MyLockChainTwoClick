@@ -3,6 +3,9 @@
 <head>
 	<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-YHDYWEJ3JH"></script>
+	
+
+
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -2212,6 +2215,13 @@ async function loadConfig() {
 
 // Load config when the page loads
 document.addEventListener("DOMContentLoaded", loadConfig);
+	
+	<script type="module">
+  import('/scripts/submitUserOp.js').then(module => {
+    window.handlePostUploadSubmission = module.handlePostUploadSubmission;
+  }).catch(err => {
+    console.error("Failed to load submitUserOp.js:", err);
+  });
 
 </script>
 </body>
