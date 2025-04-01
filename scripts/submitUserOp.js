@@ -3,9 +3,10 @@
 
 import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@5.7.2/+esm";
 import {
-  getUserOpHash,
-  packUserOp
-} from "https://cdn.jsdelivr.net/npm/@account-abstraction/sdk@latest/+esm";
+    getUserOpHash,
+    packUserOp
+  } from "https://cdn.jsdelivr.net/npm/@account-abstraction/utils@0.6.0/+esm";
+  
 
 const ENTRY_POINT = "0xE624D5227a5EefaC396426Cf8f16E6A34294bDE0";
 const PAYMASTER = "0x9e662d0ce3Eb47761BaC126aDFb27F714d819898";
