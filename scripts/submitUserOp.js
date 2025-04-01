@@ -2,14 +2,15 @@
 // Create and send a sponsored ERC-4337 UserOperation via MetaMask, EntryPoint, and Paymaster
 
 import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@5.7.2/+esm";
-import {
-  getUserOpHash,
-  packUserOp
-} from "https://cdn.jsdelivr.net/npm/@account-abstraction/utils@0.6.3/+esm"; // version-matched to v0.7 struct
+// import { Alchemy, Network } from "https://cdn.jsdelivr.net/npm/alchemy-sdk@latest/+esm";
+// import { getUserOpHash, packUserOp } from "https://cdn.jsdelivr.net/npm/@account-abstraction/sdk@latest/+esm";
+const { getUserOpHash, packUserOp } = window.AccountAbstractionUtils;
+
+// version-matched to v0.7 struct
 
 const ENTRY_POINT = "0xE624D5227a5EefaC396426Cf8f16E6A34294bDE0"; // EntryPoint
 const PAYMASTER = "0x9e662d0ce3Eb47761BaC126aDFb27F714d819898"; // Paymaster
-const BUNDLER_RPC = "https://arb-mainnet.g.alchemy.com/v2/YOUR_KEY"; // Replace with your key
+const BUNDLER_RPC = "https://arb-mainnet.g.alchemy.com/v2/R3hvZ2ZEkRFc0agXhqctMfFMYym9YvMa"; // Replace with your key
 const SMART_WALLET = "0xF22570437AC863b105a7BbD49979831286D8e9BE"; // OwnableLockChainMeta
 const REGISTRY_ADDRESS = "0x6C06aD114856E341540F53Cd377eF24c176034B3"; // ✅ NEW!
 
