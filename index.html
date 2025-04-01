@@ -4,11 +4,7 @@
 	<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-YHDYWEJ3JH"></script>
 	
-// Inject the UserOp module
-<script type="module">
-  import { handlePostUploadSubmission } from './submitUserOp.js';
-  window.handlePostUploadSubmission = handlePostUploadSubmission;
-</script>
+
 
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -1534,7 +1530,7 @@ const contractAbi = [
         const details = await actions.order.capture();
         alert('Payment successful! Processing blockchain registration...');
 
-        const response = await fetch(`${API_BASE_URL}/submitUserOp`, {          
+        const response = await fetch(`${API_BASE_URL}/submitSignedUserOp`, {          
 		method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1934,14 +1930,11 @@ function showPayPalButton(amountUSD) {
     }).render('#paypal-button-container');
 }
 
-// Inject the UserOp module
 const userOpScript = document.createElement('script');
 userOpScript.type = 'module';
-userOpScript.textContent = `
-  import { handlePostUploadSubmission } from './submitUserOp.js';
-  window.handlePostUploadSubmission = handlePostUploadSubmission;
-`;
+userOpScript.src = './scripts/submitUserOp.js'; // ✅ correct path
 document.head.appendChild(userOpScript);
+
 
  // Updated uploadToIPFS function with auto ERC-4337 submission after PayPal
 async function uploadToIPFS() {
@@ -1988,7 +1981,7 @@ async function uploadToIPFS() {
 
         // 👇 Automatically register the hash on-chain using ERC-4337 sponsored tx
         if (window.handlePostUploadSubmission) {
-            await window.handlePostUploadSubmission({ hashHex, ipfsHash });
+            await window.handlePostUploadSubmission({ hashHex, ipfsHash, userAddress: account });
         } else {
             console.warn('Submission module not found. Skipping UserOp.');
         }
