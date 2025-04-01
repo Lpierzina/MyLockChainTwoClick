@@ -1540,10 +1540,9 @@ const contractAbi = [
 		method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            documentHash: hashHex,
-            userAddress: account,
-            paymentDetails: details
-          })
+	    userOp,
+	    signature: userOp.signature // or just use `signature` directly if already separate
+	  })
         });
 
         const relayResult = await response.json();
