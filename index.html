@@ -20,10 +20,10 @@
 
 <!-- ✅ ERC-4337 Utils -->
 <script src="https://cdn.jsdelivr.net/npm/@account-abstraction/utils@0.6.0/dist/index.umd.js"></script>
-
-<script src="/scripts/submitUserOp.js"></script>
-
 	
+	<script src="/scripts/submitUserOp.js"></script>
+
+
   <meta charset="UTF-8">
   <!-- Viewport for mobile scaling -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1938,12 +1938,8 @@ function showPayPalButton(amountUSD) {
     }).render('#paypal-button-container');
 }
 
-const userOpScript = document.createElement('script');
-userOpScript.type = 'module';
-userOpScript.src = './scripts/submitUserOp.js'; // ✅ correct path
-document.head.appendChild(userOpScript);
-
-
+	
+	
  // Updated uploadToIPFS function with auto ERC-4337 submission after PayPal
 async function uploadToIPFS() {
     if (!fileToUpload) {
@@ -2267,6 +2263,7 @@ async function handleErc4337Submission({ hashHex, userAddress }) {
 // Load config when the page loads
 document.addEventListener("DOMContentLoaded", loadConfig);
 	</script>
+
 
 
 
