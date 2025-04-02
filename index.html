@@ -1862,7 +1862,7 @@ async function uploadParcelJSON() {
 			return -1;
 		}
 		if (sizeMB <= 0.5) {
-			return 1; // previously 0, now $1
+			return .1; // previously 0, now $.1
 		} else if (sizeMB <= 5) {
 			return 1;
 		} else if (sizeMB <= 20) {
