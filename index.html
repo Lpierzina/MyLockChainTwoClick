@@ -1514,60 +1514,59 @@ const contractAbi = [
     }
 	
 async function registerWithPaypal() {
-  if (!hashHex || !ipfsHash || !account) {
-    alert('❗ You must upload a file and connect your wallet first.');
+  if (!hashHex || !ipfsHash) {
+    alert('❗ You must upload a file and hash it first (Step 2).');
     return;
   }
 
+  // Save hashes to global scope so PayPal callback can use them
+  window.documentHashHex = hashHex;
+  window.ipfsHash = ipfsHash;
+
   const container = document.getElementById('paypalBlockchainContainer');
   if (!container) {
+    console.error("Element with ID 'paypalBlockchainContainer' not found.");
     alert('Error: PayPal container is missing from the page.');
     return;
   }
 
-  container.innerHTML = ''; // Clear any existing buttons
+  container.innerHTML = ''; // Clear previous buttons
 
   paypal.Buttons({
-    createOrder: (data, actions) => {
+    createOrder: function (data, actions) {
       return actions.order.create({
         purchase_units: [{ amount: { value: '1.00' } }]
       });
     },
-
-    onApprove: async (data, actions) => {
+    onApprove: async function (data, actions) {
       try {
         const details = await actions.order.capture();
-        alert('✅ PayPal payment successful! Preparing blockchain transaction...');
+        alert('✅ Payment successful! Registering on-chain...');
 
-        // 🔁 Wait until handlePostUploadSubmission is ready (max 5s)
-        let retries = 0;
-        while (!window.handlePostUploadSubmission && retries < 50) {
-          await new Promise(res => setTimeout(res, 100)); // wait 100ms
-          retries++;
+        if (typeof window.handlePostUploadSubmission === 'function') {
+          await window.handlePostUploadSubmission({
+            hashHex: window.documentHashHex,
+            ipfsHash: window.ipfsHash
+          });
+        } else {
+          console.warn("⚠️ Submission module not loaded yet.");
+          alert("Error: Submission module not loaded. Try again later.");
         }
-
-        if (typeof window.handlePostUploadSubmission !== "function") {
-          alert("❌ Submission module not ready. Try refreshing the page.");
-          return;
-        }
-
-        await window.handlePostUploadSubmission({ hashHex, ipfsHash, userAddress: account });
       } catch (err) {
-        console.error("❌ PayPal approval failed:", err);
-        alert("❌ Blockchain registration failed: " + err.message);
+        console.error('❌ Error during on-chain registration:', err);
+        alert('Blockchain registration failed: ' + err.message);
       }
     },
-
     onCancel: function () {
-      alert("Payment was canceled.");
+      alert('❌ Payment canceled.');
     },
-
     onError: function (err) {
-      console.error("PayPal error:", err);
-      alert("❌ PayPal error occurred. See console for details.");
+      console.error('❌ PayPal error:', err);
+      alert('PayPal payment failed.');
     }
   }).render('#paypalBlockchainContainer');
 }
+
 
 
 
