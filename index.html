@@ -1535,30 +1535,27 @@ const contractAbi = [
       });
     },
     onApprove: async function (data, actions) {
-      try {
-        const details = await actions.order.capture();
-        alert('Payment successful! Processing blockchain registration...');
+  try {
+    const details = await actions.order.capture();
+    alert('✅ PayPal payment successful! Proceeding to register hash on-chain.');
 
-        const response = await fetch(`${API_BASE_URL}/submitSignedUserOp`, {          
-		method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			userOp,
-			signature: userOp.signature // or just use `signature` directly if already separate
-		  })        
-		});
+    // Call the injected ERC-4337 submission method
+    if (window.handlePostUploadSubmission) {
+      await window.handlePostUploadSubmission({
+        hashHex,
+        ipfsHash,
+        userAddress: account
+      });
+    } else {
+      console.warn("⚠️ Submission module not loaded yet.");
+      alert("Submission module not ready. Please try again in a moment.");
+    }
+  } catch (err) {
+    console.error('❌ Relay transaction failed:', err);
+    alert('Blockchain registration failed: ' + err.message);
+  }
+},
 
-        const relayResult = await response.json();
-        if (relayResult.success) {
-          generateRelayReceipt(relayResult.transactionHash);
-        } else {
-          throw new Error(relayResult.error);
-        }
-      } catch (err) {
-        console.error('Relay transaction failed:', err);
-        alert('Blockchain registration failed: ' + err.message);
-      }
-    },
     onCancel: function () {
       alert('Payment cancelled.');
     },
