@@ -1,8 +1,9 @@
-// submitUserOp.js - Injected by HTML and called from uploadToIPFS()
+// submitUserOp.js - Called by uploadToIPFS() once document is pinned
+
 window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash }) {
-    console.log("📦 Starting ERC-4337 UserOp preparation (no wallet)...");
+    console.log("📦 Starting ERC-4337 UserOp preparation (no wallet required)");
   
-    // Utility: Retry wrapper
+    // Utility: Retry wrapper for flaky backend calls
     async function retryOperation(fn, retries = 2, delay = 2000) {
       for (let i = 0; i < retries; i++) {
         try {
@@ -19,26 +20,27 @@ window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash }) {
     }
   
     try {
-      // ✅ 1. Prepare userOp on the backend
-      const response = await fetch('https://mylockchain-backend-7292d672afb4.herokuapp.com/prepareUserOp', {
+      // ✅ STEP 1: Call /prepareUserOp with the hash of the pinned document
+      const prepareRes = await fetch('https://mylockchain-backend-7292d672afb4.herokuapp.com/prepareUserOp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ documentHash: hashHex })
       });
   
-      const { userOp, userOpHash } = await response.json();
+      const { userOp, userOpHash } = await prepareRes.json();
   
       if (!userOp || !userOpHash) {
         throw new Error("❌ Backend did not return a valid UserOp or UserOpHash.");
       }
   
-      console.log("🔐 No MetaMask required — using sponsored Paymaster flow.");
+      console.log("🧾 Prepared userOp:", userOp);
+      console.log("🔐 No MetaMask needed — Paymaster is sponsoring this tx");
   
-      // ✅ 2. Use empty signature (Paymaster sponsored)
+      // ✅ STEP 2: Add empty signature — handled by backend/Paymaster
       userOp.signature = "0x";
   
-      // ✅ 3. Submit signed UserOp to backend with retry
-      const submitResponse = await retryOperation(() =>
+      // ✅ STEP 3: Submit to backend /submitSignedUserOp
+      const submitRes = await retryOperation(() =>
         fetch('https://mylockchain-backend-7292d672afb4.herokuapp.com/submitSignedUserOp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -46,16 +48,16 @@ window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash }) {
         })
       );
   
-      const result = await submitResponse.json();
+      const result = await submitRes.json();
   
       if (result.success && result.txHash) {
-        console.log("✅ UserOp submitted successfully:", result.txHash);
-        alert("🎉 Document hash registered successfully!\nTx: " + result.txHash);
+        console.log("✅ Transaction submitted:", result.txHash);
+        alert(`🎉 Document registered!\n\n🔗 View on Arbiscan:\nhttps://arbiscan.io/tx/${result.txHash}`);
   
-        // Save txHash globally
+        // Save tx globally (for UI receipts)
         window.lastTxHash = result.txHash;
   
-        // Generate receipt in UI
+        // Optional: Generate a UI receipt
         if (typeof generateRelayReceipt === 'function') {
           generateRelayReceipt(result.txHash);
         }
@@ -64,9 +66,10 @@ window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash }) {
         console.error("❌ Submission failed:", result.error);
         alert("🚫 Submission failed. Check console for details.");
       }
+  
     } catch (err) {
-      console.error("❌ Error during ERC-4337 flow:", err);
-      alert("❌ Submission failed: " + (err.message || "Unknown error"));
+      console.error("❌ Fatal error during ERC-4337 flow:", err);
+      alert("❌ Failed to submit: " + (err.message || "Unknown error"));
     }
   };
   
