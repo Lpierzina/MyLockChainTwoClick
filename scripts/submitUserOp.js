@@ -21,30 +21,31 @@ window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash }) {
   
     try {
       // ✅ STEP 1: Call /prepareUserOp with the hash of the pinned document
-      const prepareRes = await fetch('https://mylockchain-backend-7292d672afb4.herokuapp.com/prepareUserOp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ documentHash: hashHex })
-      });
-  
-      const { userOp, userOpHash } = await prepareRes.json();
-  
-      if (!userOp || !userOpHash) {
-        throw new Error("❌ Backend did not return a valid UserOp or UserOpHash.");
-      }
-  
-      console.log("🧾 Prepared userOp:", userOp);
-      console.log("🔐 No MetaMask needed — Paymaster is sponsoring this tx");
-  
-      // ✅ STEP 2: Add empty signature — handled by backend/Paymaster
-      userOp.signature = "0x";
+const prepareRes = await fetch('https://mylockchain-backend-7292d672afb4.herokuapp.com/prepareUserOp', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ documentHash: hashHex })
+});
+
+const { userOp, userOpHash } = await prepareRes.json();
+
+if (!userOp || !userOpHash) {
+  throw new Error("❌ Backend did not return a valid UserOp or UserOpHash.");
+}
+
+console.log("🧾 Prepared userOp:", userOp);
+console.log("🖋️ Signature:", userOp.signature); // 👈 Add this for debugging
+console.log("🔐 No MetaMask needed — Paymaster is sponsoring this tx");
+
+// ❌ DON'T do this anymore:
+// userOp.signature = "0x";
   
       // ✅ STEP 3: Submit to backend /submitSignedUserOp
       const submitRes = await retryOperation(() =>
         fetch('https://mylockchain-backend-7292d672afb4.herokuapp.com/submitSignedUserOp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userOp, signature: userOp.signature })
+          body: JSON.stringify({ userOp }) // no need for separate `signature` field
         })
       );
   
