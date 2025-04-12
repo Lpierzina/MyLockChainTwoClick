@@ -29,25 +29,25 @@ const prepareRes = await fetch('https://mylockchain-backend-7292d672afb4.herokua
 
 const { userOp, userOpHash } = await prepareRes.json();
 
-if (!userOp || !userOpHash) {
-  throw new Error("❌ Backend did not return a valid UserOp or UserOpHash.");
-}
+// ✅ Explicitly preserve factory-related fields if they exist
+const fullUserOp = {
+  ...userOp,
+  factory: userOp.factory || undefined,
+  factoryData: userOp.factoryData || undefined
+};
 
 console.log("🧾 Prepared userOp:", userOp);
 console.log("🖋️ Signature:", userOp.signature); // 👈 Add this for debugging
 console.log("🔐 No MetaMask needed — Paymaster is sponsoring this tx");
 
-// ❌ DON'T do this anymore:
-// userOp.signature = "0x";
-  
-      // ✅ STEP 3: Submit to backend /submitSignedUserOp
-      const submitRes = await retryOperation(() =>
-        fetch('https://mylockchain-backend-7292d672afb4.herokuapp.com/submitSignedUserOp', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userOp }) // no need for separate `signature` field
-        })
-      );
+// ✅ Submit with fullUserOp
+const submitRes = await retryOperation(() =>
+  fetch('https://mylockchain-backend-7292d672afb4.herokuapp.com/submitSignedUserOp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userOp: fullUserOp })
+  })
+);
   
       const result = await submitRes.json();
   
