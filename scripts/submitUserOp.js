@@ -42,8 +42,9 @@ const fullUserOp = {
   ...(userOp.factoryData ? { factoryData: userOp.factoryData } : {})
 };
 
-console.log("🧾 Prepared fullUserOp:", fullUserOp);
-console.log("🖋️ Signature:", userOp.signature);
+console.log("🧱 Preserved factory:", fullUserOp.factory);
+console.log("🧱 Preserved factoryData:", fullUserOp.factoryData);
+
 console.log("🔐 No MetaMask needed — Paymaster is sponsoring this tx");
 
 console.log("🚀 Sending fullUserOp to backend:", fullUserOp); // FINAL CHECK
