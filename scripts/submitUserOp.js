@@ -27,7 +27,11 @@ headers: { 'Content-Type': 'application/json' },
 body: JSON.stringify({ documentHash: hashHex })
 });
 
+
 const { userOp, userOpHash } = await prepareRes.json();
+
+console.log("✅ Keys in userOp returned from /prepareUserOp:", Object.keys(userOp));
+
 
 console.log("🏗 factory from prepareUserOp:", userOp.factory);
 console.log("🏗 factoryData from prepareUserOp:", userOp.factoryData);
@@ -77,4 +81,3 @@ fetch('https://mylockchain-backend-7292d672afb4.herokuapp.com/submitSignedUserOp
     alert("❌ Failed to submit: " + (err.message || "Unknown error"));
   }
 };
-
