@@ -51,12 +51,15 @@ console.log("🚀 Sending fullUserOp to backend:", fullUserOp); // FINAL CHECK
 
 // ✅ Submit with fullUserOp
 const submitRes = await retryOperation(() =>
-fetch('https://mylockchain-backend-7292d672afb4.herokuapp.com/submitSignedUserOp', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ userOp: fullUserOp })
-})
+  fetch('https://mylockchain-backend-7292d672afb4.herokuapp.com/submitSignedUserOp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userOp: fullUserOp }, (_, v) =>
+      typeof v === 'bigint' ? v.toString() : v
+    )
+  })
 );
+
 
     const result = await submitRes.json();
 
