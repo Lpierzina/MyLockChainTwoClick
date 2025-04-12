@@ -36,6 +36,9 @@ const fullUserOp = {
   factoryData: userOp.factoryData || undefined
 };
 
+console.log("🧾 Prepared fullUserOp:", fullUserOp);
+
+
 console.log("🧾 Prepared userOp:", userOp);
 console.log("🖋️ Signature:", userOp.signature); // 👈 Add this for debugging
 console.log("🔐 No MetaMask needed — Paymaster is sponsoring this tx");
