@@ -29,12 +29,12 @@ const prepareRes = await fetch('https://mylockchain-backend-7292d672afb4.herokua
 
 const { userOp, userOpHash } = await prepareRes.json();
 
-// ✅ Explicitly preserve factory-related fields if they exist
 const fullUserOp = {
   ...userOp,
-  factory: userOp.factory || undefined,
-  factoryData: userOp.factoryData || undefined
+  ...(userOp.factory ? { factory: userOp.factory } : {}),
+  ...(userOp.factoryData ? { factoryData: userOp.factoryData } : {})
 };
+
 
 console.log("🧾 Prepared fullUserOp:", fullUserOp);
 
