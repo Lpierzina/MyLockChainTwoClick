@@ -1,4 +1,18 @@
 // submitUserOp.js - Called by uploadToIPFS() once document is pinned
+/*  ChatGPT 
+✅ This submitUserOp.js is fully built for your current architecture, which:
+Uses toSimpleSmartAccount() to generate the LightAccount
+Manually builds initCode using getAccountInitCode() from your backend’s smartAccountClient.js
+Avoids any use of .getInitCode(), which is not available on the return object from toSimpleSmartAccount() 
+(unlike toLightSmartAccount())
+
+So this version is:
+💡 LightAccount-aware
+🧬 initCode-safe for undeployed accounts
+✂️ Cleans up factory + factoryData before submission
+🔒 Compatible with Pimlico + permissionless@0.2.41 + viem@2.26.3
+may want to display LightAccount deployment status in the frontend or cache it across submissions.
+*/
 
 window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash }) {
   console.log("📦 Starting ERC-4337 UserOp preparation (no wallet required)");
@@ -42,24 +56,20 @@ const fullUserOp = {
   ...(userOp.factoryData ? { factoryData: userOp.factoryData } : {})
 };
 
-console.log("🧱 Preserved factory:", fullUserOp.factory);
-console.log("🧱 Preserved factoryData:", fullUserOp.factoryData);
-
+console.log("🧾 Prepared fullUserOp:", fullUserOp);
+console.log("🖋️ Signature:", userOp.signature);
 console.log("🔐 No MetaMask needed — Paymaster is sponsoring this tx");
 
 console.log("🚀 Sending fullUserOp to backend:", fullUserOp); // FINAL CHECK
 
 // ✅ Submit with fullUserOp
 const submitRes = await retryOperation(() =>
-  fetch('https://mylockchain-backend-7292d672afb4.herokuapp.com/submitSignedUserOp', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ userOp: fullUserOp }, (_, v) =>
-      typeof v === 'bigint' ? v.toString() : v
-    )
-  })
+fetch('https://mylockchain-backend-7292d672afb4.herokuapp.com/submitSignedUserOp', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ userOp: fullUserOp })
+})
 );
-
 
     const result = await submitRes.json();
 
