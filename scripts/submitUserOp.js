@@ -37,8 +37,11 @@ window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash }) {
     const prepareRes = await fetch('https://mylockchain-backend-7292d672afb4.herokuapp.com/prepareUserOp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ documentHash: hashHex }),
-    });
+      body: JSON.stringify({
+        documentHash: hashHex,
+        target: '0x6C06aD114856E341540F53Cd377eF24c176034B3' // registry address
+      }),
+    });      
 
     const { userOp, userOpHash } = await prepareRes.json();
 
