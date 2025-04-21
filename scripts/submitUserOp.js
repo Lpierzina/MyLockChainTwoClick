@@ -14,10 +14,6 @@ So this version is:
 may want to display LightAccount deployment status in the frontend or cache it across submissions.
 */
 
-import { encodeFunctionData } from 'viem';
-
-const registryAddress = '0x6C06aD114856E341540F53Cd377eF24c176034B3';
-
 window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash }) {
   console.log("📦 Starting ERC-4337 UserOp preparation (no wallet required)");
 
@@ -36,32 +32,12 @@ window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash }) {
     }
   }
 
-  const registryAbi = [
-    {
-      name: 'register',
-      type: 'function',
-      stateMutability: 'nonpayable',
-      inputs: [{ name: 'documentHash', type: 'bytes32' }],
-    },
-  ];
-
-  const callData = encodeFunctionData({
-    abi: registryAbi,
-    functionName: 'register',
-    args: [hashHex],
-  });
-
   try {
-    // ✅ STEP 1: Call /prepareUserOp with correct payload
+    // ✅ STEP 1: Call /prepareUserOp
     const prepareRes = await fetch('https://mylockchain-backend-7292d672afb4.herokuapp.com/prepareUserOp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        documentHash: hashHex,
-        target: registryAddress,
-        callData,
-        value: 0, // Optional: can omit if not used
-      }),
+      body: JSON.stringify({ documentHash: hashHex }),
     });
 
     const { userOp, userOpHash } = await prepareRes.json();
