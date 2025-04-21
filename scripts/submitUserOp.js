@@ -55,10 +55,7 @@ window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash }) {
       ...(userOp.factoryData ? { factoryData: userOp.factoryData } : {}),
     };
 
-    if (!fullUserOp.signature || fullUserOp.signature === '0x') {
-      throw new Error('Signature missing. Cannot submit unsigned UserOperation.');
-    }
-
+   
     console.log("🧾 Full UserOperation ready to submit:", fullUserOp);
     console.log("🖋️ Signature:", fullUserOp.signature);
 
