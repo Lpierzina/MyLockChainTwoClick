@@ -1346,6 +1346,8 @@ async function generateRelayReceipt(txHash) {
   // Generate QR code for IPFS retrieval link
   const ipfsLink = `https://gateway.pinata.cloud/ipfs/${ipfsHash}`;
   new QRCode(document.getElementById('qrCode'), ipfsLink);
+	document.getElementById('receipt').scrollIntoView({ behavior: 'smooth' });
+
 }
 
 /*****************************************************************
