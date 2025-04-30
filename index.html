@@ -1232,8 +1232,8 @@ const contractAbi = [
         const contractAddress = '0xF22570437AC863b105a7BbD49979831286D8e9BE'; // erc 4337 Arbitrum address
 
     /* Etherscan Gas Price with your API key */
-  const ETHERSCAN_API_KEY = "RSHDHJ1JEJ42DJDR5B994R62R52JUPYZIP";
-  const GAS_URL = `https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=${ETHERSCAN_API_KEY}`;
+  const ARBISCAN_API_KEY = "H7MYD24NZWPPAZSSWIDFHJ4VA5YWV38GRR"; // arbiscan api key
+  const GAS_URL = `https://api.arbiscan.io/api?module=gastracker&action=gasoracle&apikey=${ARBISCAN_API_KEY}`;
 
   document.addEventListener('DOMContentLoaded', function() {
   const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -1242,7 +1242,7 @@ const contractAbi = [
   }
 });
 
-
+/*
   async function fetchGasPrice() {
     try {
       const resp = await fetch(GAS_URL);
@@ -1378,7 +1378,7 @@ const contractAbi = [
         if (loadingOverlay) {
             loadingOverlay.style.display = show ? 'flex' : 'none';
         }
-    }
+    }  */
 	
 async function registerWithPaypal() {
   if (!hashHex || !ipfsHash) {
@@ -2071,14 +2071,17 @@ async function loadConfig() {
     const { ENTRY_POINT, SMART_WALLET, PAYMASTER, BUNDLER_RPC, REGISTRY_ADDRESS } = window.ERC4337_CONFIG;
 
     // Optional: Show in UI
-    document.getElementById("contractAddressDisplay").innerText = `Smart Wallet: ${SMART_WALLET}`;
-  } catch (err) {
-    console.error("❌ Failed to load config:", err);
-  }
-}
+		const contractAddressEl = document.getElementById("contractAddressDisplay");
+		if (contractAddressEl) {
+		  contractAddressEl.innerText = `Smart Wallet: ${SMART_WALLET}`;
+		}
+		  } catch (err) {
+			console.error("❌ Failed to load config:", err);
+		  }
+		}
 
-async function handleErc4337Submission({ hashHex, userAddress }) {
-  console.log("📦 Starting ERC-4337 UserOp preparation...");
+		async function handleErc4337Submission({ hashHex, userAddress }) {
+		  console.log("📦 Starting ERC-4337 UserOp preparation...");
 
   try {
     const signer = new ethers.providers.Web3Provider(window.ethereum).getSigner();
