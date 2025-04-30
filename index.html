@@ -1838,16 +1838,14 @@ async function uploadToIPFS() {
         qrCodeElement.innerHTML = '';
 
         const receiptHTML = `
-            <strong>File Name:</strong> ${fileName}<br>
+            <strong>File Name:</strong> ${lastUploadedFileName}<br>
             <strong>IPFS Hash:</strong> ${ipfsHash}<br>
             <strong>Document Hash (SHA-256):</strong> ${docHash}<br>
             <strong>Registered By:</strong> ${account}<br>
             <strong>Date and Time:</strong> ${dateTime}<br>
             <strong>Transaction Hash:</strong>
-            <a href="https://arbiscan.io/tx/${transactionHash}" target="_blank">
+              <a href="https://bundler.pimlico.io/userOpHash/${txHash}?chainId=42161" target="_blank">${txHash}</a>
 
-                ${transactionHash}
-            </a>
         `;
 
         receiptContentElement.innerHTML = receiptHTML;
