@@ -918,11 +918,13 @@
         Processing... Please wait.
     </p>
 </div>
+	
 	<!-- Receipt display area for all flows -->
 <div id="receipt" style="display:none; background:#e6f7ff; border:2px solid #1e429f; padding:15px; border-radius:5px; margin-top:20px;">
   <div id="receiptContent"></div>
   <div id="qrCode" style="margin-top:10px;"></div>
 </div>
+	
   
   <!-- Mobile Warning Banner (hidden by default) -->
 <div id="mobileWarning" style="display:none; background: #ffd700; color: #000; padding: 10px; text-align: center;">
@@ -1247,125 +1249,8 @@ const contractAbi = [
   }
 });
 
-/*
-  async function fetchGasPrice() {
-    try {
-      const resp = await fetch(GAS_URL);
-      const data = await resp.json();
-      if (data.status === "1") {
-        // Etherscan returns: SafeGasPrice, ProposeGasPrice, FastGasPrice
-        const proposeGasPrice = parseFloat(data.result.ProposeGasPrice);
-        document.getElementById("gasPriceDisplay").textContent = proposeGasPrice.toFixed(1);
-
-        // Update the meter fill (0 to 100% scale)
-        // For demonstration, we'll clamp the meter between 0 and 30 Gwei
-        let clamp = proposeGasPrice;
-        if (clamp > 30) clamp = 30; 
-        const percentage = (clamp / 30) * 100;
-        const meterFill = document.getElementById("meterFill");
-        meterFill.style.width = percentage + "%";
-
-        // Color logic: < 5 => green, 5-15 => orange, > 15 => red
-        let color = "green";
-        let advice = "Gas is quite low! Good time to transact.";
-        if (proposeGasPrice > 15) {
-          color = "red";
-          advice = "Gas is high. You may want to wait.";
-        }
-        else if (proposeGasPrice > 5) {
-          color = "orange";
-          advice = "Gas is moderate. Consider waiting if you want cheaper fees.";
-        }
-
-        meterFill.style.backgroundColor = color;
-        document.getElementById("gasAdvice").textContent = advice;
-      } else {
-        document.getElementById("gasPriceDisplay").textContent = "Error fetching data";
-      }
-    } catch (error) {
-      console.error("Error fetching gas price:", error);
-      document.getElementById("gasPriceDisplay").textContent = "Network Error";
-    }
-  }
-
-  // Fetch gas price on load, and every 60s
-  fetchGasPrice();
-  setInterval(fetchGasPrice, 60000);
 
 
-    // 1) Connect Wallet
-    async function connectWallet(wallet) {
-        if (wallet === 'metamask') {
-            if (window.ethereum && window.ethereum.isMetaMask) {
-                selectedProvider = window.ethereum;
-            } else {
-                alert('MetaMask is not installed. Please install MetaMask and try again.');
-                return;
-            }
-        } else if (wallet === 'coinbase') {
-            const coinbaseWallet = new CoinbaseWalletSDK({
-                appName: 'LockChain',
-                appLogoUrl: 'https://yourapp.com/logo.png',
-                darkMode: false
-            });
-            const coinbaseProvider = coinbaseWallet.makeWeb3Provider();
-            selectedProvider = coinbaseProvider;
-        } else {
-            alert('Unsupported wallet selected');
-            return;
-        }
-
-        try {
-            web3 = new Web3(selectedProvider);
-            await selectedProvider.request({ method: 'eth_requestAccounts' });
-            const accounts = await web3.eth.getAccounts();
-            account = accounts[0];
-            document.getElementById('walletAddress').innerText = 'Connected: ' + account;
-			contract = new web3.eth.Contract(contractAbi, contractAddress);
-
-            // Check network
-            await checkNetwork();
-            // Fetch and display fee
-            await displayCurrentFee();
-
-            console.log('Connected account:', account);
-        } catch (error) {
-            console.error('Error connecting to wallet:', error);
-            alert('Error connecting to wallet.');
-        }
-    }
-
-    // 2) Disconnect Wallet
-    function disconnectWallet() {
-        if (selectedProvider && selectedProvider.close) {
-            selectedProvider.close();
-        }
-        selectedProvider = null;
-        web3 = null;
-        account = null;
-        document.getElementById('walletAddress').innerText = 'Not connected';
-        alert('Wallet disconnected');
-    }
-
-		// 3) Display Current Fee (on the smart contract side)
-		async function displayCurrentFee() {
-		try {
-			const feeInWei = await contract.methods.getFee().call();
-			const feeInEth = web3.utils.fromWei(feeInWei, 'ether');
-
-			const feeNotice = document.getElementById('feeNotice');
-			if (feeNotice) {
-				feeNotice.innerText = `A small fee of ${feeInEth} ETH is required to register your document on the blockchain.`;
-			} else {
-				console.error("Element with ID 'feeNotice' not found.");
-			}
-		} catch (error) {
-			console.error('Error fetching current fee:', error);
-			alert('Error fetching current fee from the contract. Ensure your contract ABI and RPC URL are correct.');
-		}
-	}
-
- */
       // Toggles for Hidden Sections
     function toggleSection(sectionId) {
       const section = document.getElementById(sectionId);
@@ -1383,7 +1268,7 @@ const contractAbi = [
         if (loadingOverlay) {
             loadingOverlay.style.display = show ? 'flex' : 'none';
         }
-    } 
+    }  
 	
 async function registerWithPaypal() {
   if (!hashHex || !ipfsHash) {
@@ -1452,7 +1337,7 @@ async function generateRelayReceipt(txHash) {
     <strong>File Name:</strong> ${lastUploadedFileName}<br>
     <strong>IPFS Hash:</strong> ${ipfsHash}<br>
     <strong>Blockchain Transaction:</strong>
-    <a href="https://etherscan.io/tx/${txHash}" target="_blank">${txHash}</a>
+    <a href="https://arbiscan.io/tx/${txHash}" target="_blank">${txHash}</a>
   `;
 
   document.getElementById('receiptContent').innerHTML = receiptHTML;
@@ -1957,7 +1842,8 @@ async function uploadToIPFS() {
             <strong>Registered By:</strong> ${account}<br>
             <strong>Date and Time:</strong> ${dateTime}<br>
             <strong>Transaction Hash:</strong>
-            <a href="https://etherscan.io/tx/${transactionHash}" target="_blank">
+            <a href="https://arbiscan.io/tx/${transactionHash}" target="_blank">
+
                 ${transactionHash}
             </a>
         `;
@@ -2142,5 +2028,7 @@ document.addEventListener("DOMContentLoaded", loadConfig);
 
 
 	
+</body>
+</html>
 </body>
 </html>
