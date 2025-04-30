@@ -1848,7 +1848,6 @@ async function uploadToIPFS() {
         alert(`✅ Upload complete! Your document was pinned on IPFS.\n\nIPFS Hash: ${ipfsHash}`);
 
         document.getElementById('retrieveHash').value = ipfsHash;
-        document.getElementById('registerButton').disabled = false;
 
         // 👇 Automatically register the hash on-chain using ERC-4337 sponsored tx
         if (window.handlePostUploadSubmission) {
