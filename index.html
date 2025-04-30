@@ -374,7 +374,7 @@
 <div class="container">
 
     <!-- Intro / Summary -->
-    <h2>Welcome to MyLockChain</h2>
+  <h2>Welcome to MyLockChain</h2>
 	
 	
     <p>
@@ -388,7 +388,7 @@
       while allowing easy verification of its integrity.</p>
 	
 	<p>
-    **No technical skills required** – Just upload your document, let MyLockChain handle the security, and relax knowing your records are safe and verifiable anytime. Walk through the 6 easy steps below.
+    **No technical skills required** – Just upload your document, let MyLockChain handle the security, and relax knowing your records are safe and verifiable anytime. Walk through the 3 easy steps below.
 </p>
 	
   <!-- "How to Use" button + hidden 6 steps -->
@@ -430,38 +430,7 @@
 </p>
 
 
-  <h3>Step 3: Install &amp; Fund Your Wallet</h3>
-<p>
-  <strong>Set Up MetaMask or Coinbase Wallet.</strong><br/>
-  - Download MetaMask (mobile or browser extension) or the Coinbase Wallet app.<br/>
-  - Securely back up your secret recovery phrase in multiple safe places.<br/>
-  - Add a small amount of ETH to cover blockchain gas fees on the Ethereum mainnet.
-</p>
-<p>
-  <em>Why?</em> MyLockChain uses smart contracts on Ethereum. Your wallet address will 
-  hold ownership of the on-chain registration for your documents, 
-  ensuring only <strong>you</strong> can record or prove authenticity.
-</p>
-
-
-  <h3>Step 4: Connect to MyLockChain</h3>
-  <p>
-    <strong>Connect Your Wallet to the dApp.</strong><br/>
-    - Open MyLockChain and click “Connect Wallet.”<br/>
-    - Approve in MetaMask to allow the dApp to interact with your address.<br/>
-    - <em>Why?</em> This lets you register your IPFS hash on the Ethereum blockchain under your control.
-  </p>
-
-  <h3>Step 5: Register the Document Hash on Ethereum</h3>
-  <p>
-    <strong>Record on the Blockchain.</strong><br/>
-    - Pay the required gas fee to store your document’s hash on-chain.<br/>
-    - A tamper-proof record is created—any attempt to modify the file changes its IPFS hash, 
-      invalidating the on-chain record.<br/>
-    - <em>Why?</em> This ensures a permanent, unalterable proof of authenticity.
-  </p>
-
-  <h3>Step 6: Save Your Transaction Receipt &amp; IPFS Hash</h3>
+  <h3>Step 3: Save Your Transaction Receipt &amp; IPFS Hash</h3>
   <p>
     <strong>Keep Your Receipt &amp; Hash Safe.</strong><br/>
     - You’ll get a transaction receipt with a unique transaction hash.<br/>
@@ -470,16 +439,11 @@
   </p>
 </div>
 	
+	
+	
 
 
-    <!-- Buttons to show/hide the hidden sections -->
-    <div class="toggle-buttons">
-        <button onclick="toggleSection('whyStoreSection')">Why Store Documents on MyLockChain?</button>
-        <button onclick="toggleSection('ipfsIntroSection')">Introducing IPFS</button>
-    </div>
-	<p style="font-style: italic; color: #666; margin-top: 10px;">
-  Note: Follow the orange buttons for the required steps; the blue buttons are optional.
-</p>
+   
 
     <!-- Collapsible Section 1: Why Store Documents? -->
     <div id="whyStoreSection" class="hidden-section">
@@ -622,12 +586,7 @@
 <input type="file" id="fileInput" accept=".pdf,.txt,.sol,.jpg,.jpeg,.png,.mp4" />
 
     <p id="fileNameOutput"></p>
-<p>If you own property in Maricopa, see info below.</p>
-    <!-- Maricopa Lookup toggle -->
-    <button onclick="toggleSection('maricopaSection')">
-      Maricopa County Parcel Lookup
-    </button>
-    
+   
 </div>
 
   <!-- This entire block is hidden by default -->
@@ -773,7 +732,7 @@
 
 
   <!-- Step 2: Pin to IPFS -->
-	<div class="shade-box">
+  <div class="shade-box">
 <h3>Step 2: Pin Your Document on IPFS</h3>
 <p>
   <strong>Upload &amp; Hash Document.</strong><br/>
@@ -808,8 +767,6 @@
 
 
     
-<button onclick="toggleSection('maricopaSection')">Maricopa County Parcel Lookup</button>
-<p>If you own property in Maricopa County, you can look it up here.</p>
 
 <!-- This entire block is hidden by default -->
 <div id="maricopaSection" style="display:none;">
@@ -902,133 +859,13 @@
     <a id="retrievedLink" href="#" target="_blank">Download Document</a>
 </div>
 		
-		
-<!-- Step 3: Install & Fund Your Wallet -->
-<div class="shade-box">
-    <div class="wallet-section">
-        <h3>Step 3: Install &amp; Fund Your Wallet</h3>
-        
-        <p>
-            <strong>Set Up MetaMask or Coinbase Wallet.</strong><br/>
-            - Download MetaMask (mobile or browser extension) or the Coinbase Wallet app.<br/>
-            - Securely back up your secret recovery phrase in multiple safe places.<br/>
-            - Add a small amount of ETH to cover blockchain gas fees for the Ethereum mainnet.
-        </p>
+		   
 
-        <!-- ✅ Background Image Section (Between Paragraphs) -->
-        <div class="wallet-background-section"></div>
-
-        <p>
-            <em>Why?</em> MyLockChain uses smart contracts on Ethereum. Your wallet address will 
-            hold ownership of the on-chain registration for your documents, 
-            ensuring only <strong>you</strong> can record or prove authenticity.
-        </p>
-
-    </div>
-</div>
-
-	
-
-    
-  <!-- BLOCKCHAIN SECTION -->
-	<div class="shade-box">
-<div class="blockchain-section">
-    <h3>Step 4: Connect your Wallet</h3>
-
-    <!-- Example Gwei Meter -->
-    <div class="gwei-meter">
-
-      
-      <p>Current Gas Price: <span id="gasPriceDisplay">Loading...</span> Gwei</p>
-      <div class="meter-bar">
-        <div id="meterFill" class="meter-fill"></div>
-      </div>
-      <p id="gasAdvice" style="margin-top:10px; font-size:0.9em;"></p>
-    </div>
-
-    <p>
-      <em>We recommend waiting if gas is above <strong>5 Gwei</strong> 
-      to minimize fees. Transactions at higher gas can be quite costly.</em>
-    </p>
-	<p>
-  <strong>What is Gas?</strong><br/>
-  Gas is the fee you pay to process and record transactions on the Ethereum blockchain. Every time you make a transaction—such as registering your document’s hash—gas fees are required to compensate the network's miners (or validators) for validating and executing your transaction. Without gas, your transaction would not be processed, and your document would not be registered on the blockchain.
-</p>
-
-    <p>
-      A small ETH fee is required to record your document hash on the blockchain.
-      This ensures tamper-proof authenticity and makes your record publicly verifiable.
-    </p>
-	<p id="feeNotice" style="color:#1e429f; font-weight:bold;"></p>
-
-    <h4>Connect Your Wallet</h4>
-    <button onclick="connectWallet('metamask')">Connect MetaMask</button>
-    <button onclick="connectWallet('coinbase')">Connect Coinbase Wallet</button>
-    <button onclick="disconnectWallet()">Disconnect Wallet</button>
-    <p id="walletAddress">Not connected</p>
-	
-	<p>
-  <strong>Why Use a Blockchain Wallet?</strong><br/>
-  A blockchain wallet (like MetaMask or Coinbase Wallet) securely stores your private keys and enables you to sign transactions. It is essential for:
-  <ul>
-    <li>Paying the necessary gas fees to execute transactions.</li>
-    <li>Ensuring that only you have control over your digital assets and records.</li>
-    <li>Providing a secure way to interact with decentralized applications such as MyLockChain.</li>
-  </ul>
-  By connecting your wallet, you can securely register your document’s hash on the blockchain, ensuring that your record is tamper-proof and verifiable.
-</p>
-	  </div>
-		</div>
-
-  <!-- Step 5: Register on Blockchain (Enhanced) -->
-<div class="shade-box">
-  <div class="blockchain-section">
-    <h3>Step 5: Register Your Document Hash on Ethereum</h3>
-<div id="contractAddressDisplay">Loading contract address...</div>
-
-    <p>
-      <strong>Choose Registration Method:</strong><br />
-      - Option 1: Register using PayPal (Gas fees sponsored by MyLockChain).<br/>
-      - Option 2: Register with your own wallet (Metamask).
-    </p>
-
-    <!-- Option 1: PayPal-Powered Registration Button -->
-    <button id="paypalBlockchainButton" onclick="registerWithPaypal()">
-      Register on Blockchain with PayPal
-    </button>
-	  <!-- Add this div below the button -->
-<!-- Clearly identifiable PayPal container div -->
-<div id="paypalBlockchainWrapper" style="margin-top: 20px;">
-  <div id="paypalBlockchainContainer"></div>
-</div>
-
-   <!-- Option 2: Existing MetaMask Registration Button -->
-    <button id="registerButton" disabled onclick="registerHashOnBlockchain()">
-      Register on Blockchain with MetaMask
-    </button>
-
-    <div id="receipt">
-      <h3>Transaction Receipt</h3>
-      <p id="receiptContent"></p>
-      <div id="qrCode" style="margin-top:10px;"></div>
-      <p style="color:red; margin-top:15px;">
-        <strong>IMPORTANT:</strong> Save or print this receipt! You will need this information and/or the QR code to verify or retrieve your document in the future.
-      </p>
-    </div>
-
-    <!-- Image Section -->
-    <div class="step-image-section"></div>
-  </div>
-</div>
-	
-	
-
-	
 	
 <!-- Step 6: Save Your Transaction Receipt & IPFS Hash -->
 	  <div class="shade-box">
 <div style="margin-top:30px;">
-    <h3>Step 6: Save Your Transaction Receipt &amp; IPFS Hash</h3>
+    <h3>Step 3: Save Your Transaction Receipt &amp; IPFS Hash</h3>
     <p>
       <strong>Keep Your Receipt &amp; Hash Safe.</strong><br/>
       - You’ll get a transaction receipt with a unique transaction hash.<br/>
@@ -1041,8 +878,38 @@
     <button onclick="verifyDocument()">Verify Document</button>
 
  </div>
-	</div>
-	 
+	
+	
+	<!-- ⬇️ Collapsed UI Sections moved below Step 3 -->
+  <div class="shade-box">
+    <h3>Learn More</h3>
+    <p>Use the toggles below to explore how MyLockChain works and why IPFS matters.</p>
+    <button onclick="toggleSection('howToUseSection')">How to Use MyLockChain</button>
+    <div id="howToUseSection" style="display:none; margin-top:30px;"> ... </div>
+
+    <button onclick="toggleSection('whyStoreSection')">Why Store Documents on MyLockChain?</button>
+    <div id="whyStoreSection" class="hidden-section"> ... </div>
+
+    <button onclick="toggleSection('ipfsIntroSection')">Introducing IPFS</button>
+    <div id="ipfsIntroSection" class="hidden-section"> ... </div>
+  </div>
+
+  <!-- BONUS SECTION: Maricopa Lookup -->
+  <div class="shade-box">
+    <h3>Bonus: Lookup Your Arizona Parcel</h3>
+    <p>
+      If you own property in <strong>Maricopa County</strong>, you can securely look up your parcel, retrieve ownership and valuation data, and pin the parcel's details to IPFS—all from within MyLockChain.
+      This enhances the chain of custody for your real estate documentation.
+    </p>
+    <button onclick="toggleSection('maricopaSection')">Maricopa County Parcel Lookup</button>
+  </div>
+
+  <!-- Keep parcel section below for reference -->
+  <div id="maricopaSection" style="display:none;">
+    <!-- Maricopa lookup content remains unchanged -->
+    <p>This section allows APN search, download, and IPFS upload of county parcel data.</p>
+  </div>
+	 </div>
 
 <!-- Spinner Overlay -->
 <div id="loadingOverlay">
