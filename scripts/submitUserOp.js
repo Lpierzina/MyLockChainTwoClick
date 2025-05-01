@@ -57,43 +57,51 @@ window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash, fileNam
   
     // ✅ Moved OUTSIDE of try block
     async function verifyRegistrationAndShowReceipt(hashHex, txHash, ipfsHash, fileName) {
-        try {
-          const res = await fetch(`${API_BASE_URL}/checkRegistration`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ hashHex })
-          });
+        const maxRetries = 6;
+        const baseDelay = 1500;
       
-          const { isRegistered, registrant, timestamp } = await res.json();
+        for (let attempt = 0; attempt < maxRetries; attempt++) {
+          try {
+            const res = await fetch(`${API_BASE_URL}/checkRegistration`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ hashHex })
+            });
       
-          if (!isRegistered) {
-            alert("❌ Document was not found in the LockChainRegistry. Something went wrong.");
-            return;
+            const { isRegistered, registrant, timestamp } = await res.json();
+      
+            if (isRegistered) {
+              const readableDate = new Date(timestamp * 1000).toLocaleString();
+              const receiptEl = document.getElementById("receipt");
+              const contentEl = document.getElementById("receiptContent");
+              const qrCodeEl = document.getElementById("qrCode");
+      
+              if (receiptEl && contentEl && qrCodeEl) {
+                contentEl.innerHTML = `
+                  <strong>File Name:</strong> ${fileName}<br>
+                  <strong>IPFS Hash:</strong> ${ipfsHash}<br>
+                  <strong>Blockchain Transaction:</strong>
+                  <a href="https://arbiscan.io/tx/${txHash}" target="_blank">${txHash}</a><br>
+                  <strong>Registered By:</strong> ${registrant}<br>
+                  <strong>Timestamp:</strong> ${readableDate}
+                `;
+                qrCodeEl.innerHTML = '';
+                new QRCode(qrCodeEl, `https://gateway.pinata.cloud/ipfs/${ipfsHash}`);
+                receiptEl.style.display = 'block';
+                receiptEl.scrollIntoView({ behavior: 'smooth' });
+              }
+              return; // ✅ Success, exit loop
+            }
+      
+            console.warn(`🔁 Retry ${attempt + 1}: Not yet registered. Waiting...`);
+          } catch (err) {
+            console.error(`⚠️ Error checking registration (attempt ${attempt + 1}):`, err.message);
           }
       
-          const readableDate = new Date(timestamp * 1000).toLocaleString();
-          const receiptEl = document.getElementById("receipt");
-          const contentEl = document.getElementById("receiptContent");
-          const qrCodeEl = document.getElementById("qrCode");
-      
-          if (receiptEl && contentEl && qrCodeEl) {
-            contentEl.innerHTML = `
-              <strong>File Name:</strong> ${fileName}<br>
-              <strong>IPFS Hash:</strong> ${ipfsHash}<br>
-              <strong>Blockchain Transaction:</strong>
-              <a href="https://arbiscan.io/tx/${txHash}" target="_blank">${txHash}</a><br>
-              <strong>Registered By:</strong> ${registrant}<br>
-              <strong>Timestamp:</strong> ${readableDate}
-            `;
-            qrCodeEl.innerHTML = '';
-            new QRCode(qrCodeEl, `https://gateway.pinata.cloud/ipfs/${ipfsHash}`);
-            receiptEl.style.display = 'block';
-            receiptEl.scrollIntoView({ behavior: 'smooth' });
-          }
-        } catch (err) {
-          console.error("Verification failed:", err);
-          alert("⚠️ Could not verify registration on-chain.");
+          await new Promise(res => setTimeout(res, baseDelay * Math.pow(1.5, attempt)));
         }
+      
+        alert("❌ Document was not found in the LockChainRegistry after several attempts. Please try again later.");
       }
       
   };
