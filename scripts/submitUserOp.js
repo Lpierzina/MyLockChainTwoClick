@@ -1,5 +1,6 @@
 // submitUserOp.js - Called by uploadToIPFS() once document is pinned
-  window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash }) {
+window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash, fileName }) {
+
     console.log("📦 Starting ERC-4337 UserOp submission (no wallet required)");
   
     async function retryOperation(fn, retries = 2, delay = 2000) {
@@ -34,11 +35,12 @@
         window.lastTxHash = result.hash;
   
         await verifyRegistrationAndShowReceipt(
-          hashHex,
-          result.hash,
-          ipfsHash,
-          lastUploadedFileName
-        );
+            hashHex,
+            result.hash,
+            ipfsHash,
+            fileName
+          );
+          
   
         if (typeof generateRelayReceipt === 'function') {
           generateRelayReceipt(result.hash);
