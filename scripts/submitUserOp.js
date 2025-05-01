@@ -112,10 +112,7 @@ window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash, fileNam
         }
       };
   
-      if (typeof generateRelayReceipt === "function") {
-        generateRelayReceipt(txHash);
-      }
-  
+       
     } catch (err) {
       console.error("❌ Fatal error during submission:", err);
       alert("❌ Failed to submit UserOp: " + (err.message || "Unknown error"));
