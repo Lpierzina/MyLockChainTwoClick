@@ -1,6 +1,5 @@
 // submitUserOp.js - Called by uploadToIPFS() once document is pinned
 window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash, fileName }) {
-
     console.log("📦 Starting ERC-4337 UserOp submission (no wallet required)");
   
     async function retryOperation(fn, retries = 2, delay = 2000) {
@@ -19,7 +18,6 @@ window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash, fileNam
     }
   
     try {
-      // ✅ STEP 1: Directly call /pimlicoSmartAccountClient
       const submitRes = await retryOperation(() =>
         fetch('https://mylockchain-backend-7292d672afb4.herokuapp.com/pimlicoSmartAccountClient', {
           method: 'POST',
@@ -29,25 +27,18 @@ window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash, fileNam
       );
   
       const result = await submitRes.json();
+      const txHash = result.hash;
   
-      if (result.hash) {
-        console.log("✅ UserOp submitted. Bundler hash:", result.hash);
-        window.lastTxHash = result.hash;
+      if (!txHash || !/^0x([A-Fa-f0-9]{64})$/.test(txHash)) {
+        console.warn("⚠️ Response hash might not be a real transaction yet:", txHash);
+      }
   
-        await verifyRegistrationAndShowReceipt(
-            hashHex,
-            result.hash,
-            ipfsHash,
-            fileName
-          );
-          
+      window.lastTxHash = txHash;
   
-        if (typeof generateRelayReceipt === 'function') {
-          generateRelayReceipt(result.hash);
-        }
-      } else {
-        console.error("❌ Submission failed:", result.error);
-        alert("🚫 Submission failed. Check console for details.");
+      await verifyRegistrationAndShowReceipt(hashHex, txHash, ipfsHash, fileName);
+  
+      if (typeof generateRelayReceipt === 'function') {
+        generateRelayReceipt(txHash); // use txHash here too
       }
   
     } catch (err) {
@@ -55,54 +46,53 @@ window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash, fileNam
       alert("❌ Failed to submit: " + (err.message || "Unknown error"));
     }
   
-    // ✅ Moved OUTSIDE of try block
     async function verifyRegistrationAndShowReceipt(hashHex, txHash, ipfsHash, fileName) {
-        const maxRetries = 6;
-        const baseDelay = 1500;
-      
-        for (let attempt = 0; attempt < maxRetries; attempt++) {
-          try {
-            const res = await fetch(`${API_BASE_URL}/checkRegistration`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ hashHex })
-            });
-      
-            const { isRegistered, registrant, timestamp } = await res.json();
-      
-            if (isRegistered) {
-              const readableDate = new Date(timestamp * 1000).toLocaleString();
-              const receiptEl = document.getElementById("receipt");
-              const contentEl = document.getElementById("receiptContent");
-              const qrCodeEl = document.getElementById("qrCode");
-      
-              if (receiptEl && contentEl && qrCodeEl) {
-                contentEl.innerHTML = `
-                  <strong>File Name:</strong> ${fileName}<br>
-                  <strong>IPFS Hash:</strong> ${ipfsHash}<br>
-                  <strong>Blockchain Transaction:</strong>
-                  <a href="https://arbiscan.io/tx/${txHash}" target="_blank">${txHash}</a><br>
-                  <strong>Registered By:</strong> ${registrant}<br>
-                  <strong>Timestamp:</strong> ${readableDate}
-                `;
-                qrCodeEl.innerHTML = '';
-                new QRCode(qrCodeEl, `https://gateway.pinata.cloud/ipfs/${ipfsHash}`);
-                receiptEl.style.display = 'block';
-                receiptEl.scrollIntoView({ behavior: 'smooth' });
-              }
-              return; // ✅ Success, exit loop
+      const maxRetries = 6;
+      const baseDelay = 1500;
+  
+      for (let attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+          const res = await fetch(`${API_BASE_URL}/checkRegistration`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ hashHex })
+          });
+  
+          const { isRegistered, registrant, timestamp } = await res.json();
+  
+          if (isRegistered) {
+            const readableDate = new Date(timestamp * 1000).toLocaleString();
+            const receiptEl = document.getElementById("receipt");
+            const contentEl = document.getElementById("receiptContent");
+            const qrCodeEl = document.getElementById("qrCode");
+  
+            if (receiptEl && contentEl && qrCodeEl) {
+              contentEl.innerHTML = `
+                <strong>File Name:</strong> ${fileName}<br>
+                <strong>IPFS Hash:</strong> ${ipfsHash}<br>
+                <strong>Blockchain Transaction:</strong>
+                <a href="https://arbiscan.io/tx/${txHash}" target="_blank">${txHash}</a><br>
+                <strong>Registered By:</strong> ${registrant}<br>
+                <strong>Timestamp:</strong> ${readableDate}
+              `;
+              qrCodeEl.innerHTML = '';
+              new QRCode(qrCodeEl, `https://gateway.pinata.cloud/ipfs/${ipfsHash}`);
+              receiptEl.style.display = 'block';
+              receiptEl.scrollIntoView({ behavior: 'smooth' });
             }
-      
-            console.warn(`🔁 Retry ${attempt + 1}: Not yet registered. Waiting...`);
-          } catch (err) {
-            console.error(`⚠️ Error checking registration (attempt ${attempt + 1}):`, err.message);
+            return;
           }
-      
-          await new Promise(res => setTimeout(res, baseDelay * Math.pow(1.5, attempt)));
+  
+          console.warn(`🔁 Retry ${attempt + 1}: Not yet registered. Waiting...`);
+  
+        } catch (err) {
+          console.error(`⚠️ Error checking registration (attempt ${attempt + 1}):`, err.message);
         }
-      
-        alert("❌ Document was not found in the LockChainRegistry after several attempts. Please try again later.");
+  
+        await new Promise(res => setTimeout(res, baseDelay * Math.pow(1.5, attempt)));
       }
-      
+  
+      alert("❌ Document was not found in the LockChainRegistry after several attempts. Please try again later.");
+    }
   };
   
