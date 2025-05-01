@@ -23,9 +23,7 @@
         fetch('https://mylockchain-backend-7292d672afb4.herokuapp.com/pimlicoSmartAccountClient', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            documentHash: hashHex, // Coming from uploadToIPFS()
-          }),
+          body: JSON.stringify({ documentHash: hashHex }),
         })
       );
   
@@ -33,8 +31,15 @@
   
       if (result.hash) {
         console.log("✅ UserOp submitted. Bundler hash:", result.hash);
-        alert(`🎉 Document registered!\n\n🔗 View UserOp on Arbiscan Bundler View:\nhttps://arbiscan.io/tx/${result.hash}`);
         window.lastTxHash = result.hash;
+  
+        await verifyRegistrationAndShowReceipt(
+          hashHex,
+          result.hash,
+          ipfsHash,
+          lastUploadedFileName
+        );
+  
         if (typeof generateRelayReceipt === 'function') {
           generateRelayReceipt(result.hash);
         }
@@ -47,5 +52,47 @@
       console.error("❌ Fatal error in UserOp flow:", err);
       alert("❌ Failed to submit: " + (err.message || "Unknown error"));
     }
+  
+    // ✅ Moved OUTSIDE of try block
+    async function verifyRegistrationAndShowReceipt(hashHex, txHash, ipfsHash, fileName) {
+        try {
+          const res = await fetch(`${API_BASE_URL}/checkRegistration`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ hashHex })
+          });
+      
+          const { isRegistered, registrant, timestamp } = await res.json();
+      
+          if (!isRegistered) {
+            alert("❌ Document was not found in the LockChainRegistry. Something went wrong.");
+            return;
+          }
+      
+          const readableDate = new Date(timestamp * 1000).toLocaleString();
+          const receiptEl = document.getElementById("receipt");
+          const contentEl = document.getElementById("receiptContent");
+          const qrCodeEl = document.getElementById("qrCode");
+      
+          if (receiptEl && contentEl && qrCodeEl) {
+            contentEl.innerHTML = `
+              <strong>File Name:</strong> ${fileName}<br>
+              <strong>IPFS Hash:</strong> ${ipfsHash}<br>
+              <strong>Blockchain Transaction:</strong>
+              <a href="https://arbiscan.io/tx/${txHash}" target="_blank">${txHash}</a><br>
+              <strong>Registered By:</strong> ${registrant}<br>
+              <strong>Timestamp:</strong> ${readableDate}
+            `;
+            qrCodeEl.innerHTML = '';
+            new QRCode(qrCodeEl, `https://gateway.pinata.cloud/ipfs/${ipfsHash}`);
+            receiptEl.style.display = 'block';
+            receiptEl.scrollIntoView({ behavior: 'smooth' });
+          }
+        } catch (err) {
+          console.error("Verification failed:", err);
+          alert("⚠️ Could not verify registration on-chain.");
+        }
+      }
+      
   };
   
