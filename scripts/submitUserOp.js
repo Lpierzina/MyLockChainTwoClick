@@ -3,12 +3,12 @@ window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash, fileNam
   console.log("📦 Starting ERC-4337 UserOp submission (no wallet required)");
 
   try {
-    // Get registry address for the receipt
+    // 🔧 Fetch registry address from /config
     const configRes = await fetch("https://mylockchain-backend-7292d672afb4.herokuapp.com/config");
     const config = await configRes.json();
     const registryAddress = config.ERC4337_CONFIG.REGISTRY_ADDRESS;
 
-    // Submit UserOp
+    // 🚀 Submit UserOp
     const submitRes = await fetch("https://mylockchain-backend-7292d672afb4.herokuapp.com/pimlicoSmartAccountClient", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -23,20 +23,22 @@ window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash, fileNam
       alert("⚠️ Submission returned an unexpected hash. Please verify manually.");
     }
 
-    // Wait for registry confirmation
+    // ⏱ Wait for the registry contract to confirm the document
     await new Promise(r => setTimeout(r, 2000));
     const regCheckRes = await fetch("https://mylockchain-backend-7292d672afb4.herokuapp.com/checkRegistration", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ hashHex }),
+      body: JSON.stringify({ hashHex })
     });
 
     const { isRegistered, registrant, timestamp } = await regCheckRes.json();
-    const readableTime = timestamp ? new Date(timestamp * 1000).toLocaleString() : "(pending)";
-    const ipfsGateway = `https://gateway.pinata.cloud/ipfs/${ipfsHash}`;
-    const explorerUrl = `https://arbiscan.io/tx/${txHash}`;
+    const readableDate = timestamp ? new Date(timestamp * 1000).toLocaleString() : "(pending)";
 
-    // Render the receipt
+    // 🔗 Arbiscan link
+    const explorerUrl = `https://arbiscan.io/tx/${txHash}`;
+    const ipfsGateway = `https://gateway.pinata.cloud/ipfs/${ipfsHash}`;
+
+    // 🧾 Show receipt
     const receiptEl = document.getElementById("receipt");
     const contentEl = document.getElementById("receiptContent");
     const qrCodeEl = document.getElementById("qrCode");
@@ -50,8 +52,8 @@ window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash, fileNam
           <li><strong>📦 IPFS Hash (CID):</strong> <code>${ipfsHash}</code></li>
           <li><strong>🔗 View/Download File:</strong> <a href="${ipfsGateway}" target="_blank">${ipfsGateway}</a></li>
           <li><strong>🔒 Document Hash (Keccak256):</strong> <code>${hashHex}</code></li>
-          <li><strong>👤 Registered By:</strong> ${registrant}</li>
-          <li><strong>🕒 Timestamp:</strong> ${readableTime}</li>
+          <li><strong>👤 Registered By:</strong> ${registrant || "(unknown)"}</li>
+          <li><strong>🕒 Timestamp:</strong> ${readableDate}</li>
           <li><strong>📜 Smart Contract:</strong> <a href="https://arbiscan.io/address/${registryAddress}" target="_blank">LockChainRegistry.sol</a></li>
           <li><strong>🧾 Transaction:</strong> <a href="${explorerUrl}" target="_blank">${txHash}</a></li>
         </ul>
@@ -59,8 +61,12 @@ window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash, fileNam
         <hr>
 
         <h4>📘 What's the Difference?</h4>
-        <p><strong>IPFS Hash:</strong> This CID retrieves your file from the decentralized IPFS network. Anyone with this link can view or download it.</p>
-        <p><strong>Document Hash:</strong> This is a cryptographic Keccak256 hash of your file, recorded on-chain. It proves the document hasn’t been changed.</p>
+        <p><strong>IPFS Hash:</strong> This is a content identifier (CID) used to retrieve your file from the decentralized IPFS network. You can share this with others so they can view or download the file.</p>
+        <p><strong>Document Hash:</strong> This is a Keccak256 cryptographic hash of your document. It was recorded immutably on-chain. Anyone can verify that a document has not been altered by checking its hash against the registry.</p>
+
+        <hr>
+
+        <p>✅ Save this receipt for your records. For questions, visit <a href="https://mylockchain.io" target="_blank">MyLockChain.io</a>.</p>
 
         <hr>
 
@@ -69,15 +75,13 @@ window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash, fileNam
         <button onclick="sendReceiptByEmail()">Send Receipt</button>
       `;
 
-      // Clear QR container and render exactly one QR code (IPFS link only)
       qrCodeEl.innerHTML = '';
       new QRCode(qrCodeEl, ipfsGateway);
-
       receiptEl.style.display = 'block';
       receiptEl.scrollIntoView({ behavior: 'smooth' });
     }
 
-    // Optional email function
+    // 📬 Email logic
     window.sendReceiptByEmail = async function () {
       const email = document.getElementById("emailInput").value;
       if (!email || !email.includes("@")) {
@@ -96,8 +100,8 @@ window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash, fileNam
             hashHex,
             txHash,
             registrant,
-            timestamp,
-          }),
+            timestamp
+          })
         });
 
         const json = await res.json();
