@@ -1743,7 +1743,7 @@ async function uploadToIPFS() {
 
         // 👇 Automatically register the hash on-chain using ERC-4337 sponsored tx
         if (window.handlePostUploadSubmission) {
-            await window.handlePostUploadSubmission({ hashHex, ipfsHash, userAddress: account });
+            await window.handlePostUploadSubmission({ hashHex, ipfsHash, fileName: fileToUpload?.name || "(unknown)" });
         } else {
             console.warn('Submission module not found. Skipping UserOp.');
         }
