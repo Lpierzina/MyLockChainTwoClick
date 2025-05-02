@@ -1,5 +1,7 @@
 // submitUserOp.js - Called by uploadToIPFS() once document is pinned
 window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash, fileName }) {
+    window.lastUploadedFileName = fileName; // ✅ Store for later use
+    console.log("📦 File name stored for later use:", fileName);
     console.log("📦 Starting ERC-4337 UserOp submission (no wallet required)");
   
     try {
@@ -46,7 +48,7 @@ window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash, fileNam
           <h2>📄 Your LockChain.io Registration Receipt</h2>
           <p>This is your permanent proof of document registration on the Arbitrum blockchain.</p>
           <ul>
-            <li><strong>📁 File Name:</strong> ${fileName}</li>
+            <li><strong>📁 File Name:</strong> ${fileName || window.lastUploadedFileName || "(unknown)"}</li>
             <li><strong>📦 IPFS Hash (CID):</strong> <code>${ipfsHash}</code></li>
             <li><strong>🔗 View/Download File:</strong> <a href="${ipfsGateway}" target="_blank">${ipfsGateway}</a></li>
             <li><strong>🔒 Document Hash (Keccak256):</strong> <code>${hashHex}</code></li>
@@ -86,19 +88,19 @@ window.handlePostUploadSubmission = async function ({ hashHex, ipfsHash, fileNam
         }
   
         try {
-          const res = await fetch("https://mylockchain-backend-7292d672afb4.herokuapp.com/sendReceipt", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              email,
-              fileName,
-              ipfsHash,
-              hashHex,
-              txHash,
-              registrant,
-              timestamp,
-            }),
-          });
+            const res = await fetch("https://mylockchain-backend-7292d672afb4.herokuapp.com/sendReceipt", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                email,
+                fileName: fileName || window.lastUploadedFileName || "(unknown)",
+                ipfsHash,
+                hashHex,
+                txHash,
+                registrant,
+                timestamp,
+              }),
+            });
   
           const json = await res.json();
           if (json.success) {
