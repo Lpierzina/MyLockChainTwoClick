@@ -1861,44 +1861,55 @@ async function uploadToIPFS() {
 
     // 6) Verify Document (no change)
     async function verifyDocument() {
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = '.pdf';
-        fileInput.onchange = async (e) => {
-            const file = e.target.files[0];
-            if (!file) {
-                alert('No file selected.');
-                return;
-            }
-            const arrayBuffer = await file.arrayBuffer();
-            const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            const hashHexToVerify =
-                '0x' + hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = '.pdf,.txt,.sol,.jpg,.jpeg,.png,.mp4'; // Support all types
 
-            try {
-                const isRegistered = await contract.methods
-                    .isDocumentRegistered(hashHexToVerify)
-                    .call();
-                if (isRegistered) {
-                    const details = await contract.methods
-                        .getDocumentDetails(hashHexToVerify)
-                        .call();
-                    alert(
-                        `Document is registered.\n` +
-                        `Registrant: ${details.registrant}\n` +
-                        `Timestamp: ${new Date(details.timestamp * 1000).toLocaleString()}`
-                    );
-                } else {
-                    alert('Document is not registered.');
-                }
-            } catch (error) {
-                console.error('Error verifying document:', error);
-                alert('Error verifying document.');
-            }
-        };
-        fileInput.click();
+  fileInput.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) {
+      alert('No file selected.');
+      return;
     }
+
+    // Hash the file using SHA-256
+    const arrayBuffer = await file.arrayBuffer();
+    const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHexToVerify = '0x' + hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+    try {
+      // Ensure web3 and contract are initialized
+      if (!web3) {
+        web3 = new Web3(Web3.givenProvider || "https://arb1.arbitrum.io/rpc");
+      }
+      if (!contract) {
+        contract = new web3.eth.Contract(contractAbi, contractAddress);
+      }
+
+      // ✅ Updated function call: isRegistered
+      const isRegistered = await contract.methods.isRegistered(hashHexToVerify).call();
+
+      if (isRegistered) {
+        const details = await contract.methods.getDocumentDetails(hashHexToVerify).call();
+        alert(
+          `✅ Document is registered.\n` +
+          `Registrant: ${details.registrant}\n` +
+          `Timestamp: ${new Date(details.timestamp * 1000).toLocaleString()}`
+        );
+      } else {
+        alert('❌ Document is not registered.');
+      }
+
+    } catch (error) {
+      console.error('Error verifying document:', error);
+      alert('Error verifying document.');
+    }
+  };
+
+  fileInput.click();
+}
+
 
    // Check Network (Ethereum Mainnet)
 async function checkNetwork() {
