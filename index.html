@@ -1890,17 +1890,16 @@ async function uploadToIPFS() {
       // ✅ Updated function call: isRegistered
       const isRegistered = await contract.methods.isRegistered(hashHexToVerify).call();
 
-      if (isRegistered) {
-        const details = await contract.methods.getDocumentDetails(hashHexToVerify).call();
-        alert(
-          `✅ Document is registered.\n` +
-          `Registrant: ${details.registrant}\n` +
-          `Timestamp: ${new Date(details.timestamp * 1000).toLocaleString()}`
-        );
-      } else {
-        alert('❌ Document is not registered.');
-      }
-
+     if (isRegistered) {
+    const [registrant, timestamp] = await contract.methods.getDetails(hashHexToVerify).call();
+    alert(
+      `✅ Document is registered.\n` +
+      `Registrant: ${registrant}\n` +
+      `Timestamp: ${new Date(timestamp * 1000).toLocaleString()}`
+    );
+  } else {
+    alert('❌ Document is not registered.');
+  }
     } catch (error) {
       console.error('Error verifying document:', error);
       alert('Error verifying document.');
@@ -1909,6 +1908,7 @@ async function uploadToIPFS() {
 
   fileInput.click();
 }
+
 
 
    // Check Network (Ethereum Mainnet)
