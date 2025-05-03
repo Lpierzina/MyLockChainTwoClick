@@ -931,6 +931,8 @@
   For best results on mobile, use MetaMask’s in-app browser if you want to register on the blockchain.
 </div>
 
+<!-- verify button receipt -->
+<div id="verificationResult"></div>
 
 <div class="footer">
     &copy; 2024 MyLockChain. All Rights Reserved.
@@ -1860,7 +1862,7 @@ async function uploadToIPFS() {
     }
 
     // 6) Verify Document (no change)
- async function verifyDocument() {
+async function verifyDocument() {
   const fileInput = document.createElement('input');
   fileInput.type = 'file';
   fileInput.accept = '.pdf,.txt,.sol,.jpg,.jpeg,.png,.mp4';
@@ -1887,6 +1889,7 @@ async function uploadToIPFS() {
       const data = await response.json();
 
       if (data.isRegistered) {
+        const CONTRACT_ADDRESS = '0xYourRegistryAddressHere'; // Replace with actual
         const receipt = `
 📜 Document Registration Receipt
 ───────────────────────────────
@@ -1895,16 +1898,38 @@ async function uploadToIPFS() {
 🧾 File Hash: ${hashHexToVerify}
 👤 Registrant: ${data.registrant}
 ⏰ Timestamp: ${new Date(data.timestamp * 1000).toLocaleString()}
-🔗 Contract: https://arbiscan.io/address/${contractAddress}
+🔗 Contract: https://arbiscan.io/address/${CONTRACT_ADDRESS}
         `.trim();
 
-        // Copy to clipboard
-        await navigator.clipboard.writeText(receipt);
-        alert('✅ Document is registered.\n\nReceipt copied to clipboard!');
+        // Display the receipt in the UI
+        const receiptDiv = document.createElement('div');
+        receiptDiv.style.whiteSpace = 'pre-wrap';
+        receiptDiv.style.marginTop = '20px';
+        receiptDiv.style.padding = '15px';
+        receiptDiv.style.border = '1px solid #ccc';
+        receiptDiv.style.borderRadius = '8px';
+        receiptDiv.style.background = '#f9f9f9';
+        receiptDiv.textContent = receipt;
 
-        // Ask for email
-        const email = prompt('📧 Enter your email to receive a receipt:');
-        if (email && email.includes('@')) {
+        // Email form
+        const emailInput = document.createElement('input');
+        emailInput.type = 'email';
+        emailInput.placeholder = 'Enter your email for receipt';
+        emailInput.style.marginTop = '10px';
+        emailInput.style.padding = '8px';
+        emailInput.style.width = '300px';
+        emailInput.style.display = 'block';
+
+        const sendButton = document.createElement('button');
+        sendButton.textContent = 'Send Email Receipt';
+        sendButton.style.marginTop = '8px';
+        sendButton.onclick = async () => {
+          const email = emailInput.value.trim();
+          if (!email || !email.includes('@')) {
+            alert('Please enter a valid email.');
+            return;
+          }
+
           const sendRes = await fetch('https://mylockchain-backend-7292d672afb4.herokuapp.com/sendReceipt', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1923,9 +1948,19 @@ async function uploadToIPFS() {
           if (sendJson.success) {
             alert('📩 Email sent successfully!');
           } else {
-            alert('⚠️ Email failed: ' + (sendJson.error || 'Unknown error'));
+            alert('❌ Email failed: ' + (sendJson.error || 'Unknown error'));
           }
-        }
+        };
+
+        // Mount everything to the page
+        const resultContainer = document.getElementById('verificationResult') || document.createElement('div');
+        resultContainer.id = 'verificationResult';
+        resultContainer.innerHTML = ''; // Clear old results
+        resultContainer.appendChild(receiptDiv);
+        resultContainer.appendChild(emailInput);
+        resultContainer.appendChild(sendButton);
+
+        document.body.appendChild(resultContainer);
 
       } else {
         alert('❌ Document is not registered on the blockchain.');
