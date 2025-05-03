@@ -1962,6 +1962,11 @@ async function verifyDocument() {
 
         document.body.appendChild(resultContainer);
 
+      	// ✅ Auto-scroll to the receipt
+	setTimeout(() => {
+	  resultContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+	}, 100);
+
       } else {
         alert('❌ Document is not registered on the blockchain.');
       }
