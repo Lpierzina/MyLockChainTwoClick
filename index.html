@@ -1254,13 +1254,17 @@ const contractAbi = [
 
       // Toggles for Hidden Sections
     function toggleSection(sectionId) {
-      const section = document.getElementById(sectionId);
-      if (section.style.display === "none" || section.style.display === "") {
-        section.style.display = "block";
-      } else {
-        section.style.display = "none";
-      }
-    }
+  const section = document.getElementById(sectionId);
+  const isHidden = section.style.display === "none" || section.style.display === "";
+
+  section.style.display = isHidden ? "block" : "none";
+
+  // Only scroll into view if we're showing the section
+  if (isHidden) {
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
 
 
     // Loading Overlay
