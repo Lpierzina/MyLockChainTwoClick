@@ -893,21 +893,36 @@
     <div id="ipfsIntroSection" class="hidden-section"> ... </div>
   </div>
 
-  <!-- BONUS SECTION: Maricopa Lookup -->
-  <div class="shade-box">
-    <h3>Bonus: Lookup Your Arizona Parcel</h3>
-    <p>
-      If you own property in <strong>Maricopa County</strong>, you can securely look up your parcel, retrieve ownership and valuation data, and pin the parcel's details to IPFS—all from within MyLockChain.
-      This enhances the chain of custody for your real estate documentation.
-    </p>
-    <button onclick="toggleSection('maricopaSection')">Maricopa County Parcel Lookup</button>
+ <!-- BONUS SECTION -->
+<div class="shade-box" style="margin-top: 60px; padding: 40px; border-radius: 12px; background-color: #f9f9f9;">
+  <h3 style="text-align: center;">Bonus: Lookup Your Arizona Parcel</h3>
+  <p style="text-align: center; max-width: 700px; margin: 0 auto 20px; font-size: 16px;">
+    If you own property in <strong>Maricopa County</strong>, you can securely look up your parcel, retrieve ownership and valuation data, 
+    and pin the parcel's details to IPFS—all from within MyLockChain. This enhances the chain of custody for your real estate documentation.
+  </p>
+  <div style="text-align: center; margin-bottom: 30px;">
+    <button onclick="toggleSection('maricopaSection')" style="padding: 12px 24px; font-size: 16px; border-radius: 8px; background-color: #0074d9; color: white; border: none; cursor: pointer;">
+      🔍 Maricopa County Parcel Lookup
+    </button>
   </div>
 
-  <!-- Keep parcel section below for reference -->
-  <div id="maricopaSection" style="display:none;">
-    <!-- Maricopa lookup content remains unchanged -->
-    <p>This section allows APN search, download, and IPFS upload of county parcel data.</p>
+  <hr style="margin: 40px auto; max-width: 500px; border: none; border-top: 1px solid #ccc;">
+
+  <h3 style="text-align: center;">Bonus: Try the Original Version</h3>
+  <p style="text-align: center; max-width: 700px; margin: 0 auto 20px; font-size: 16px;">
+    Prefer the original interface? You can still use <strong>MyLockChain v1</strong>, which requires MetaMask and manual transaction confirmation. 
+    It's the same powerful engine—just with a wallet-based workflow.
+  </p>
+  <div style="text-align: center;">
+    <button
+      onclick="window.open('https://mytitlelock.netlify.app/', '_blank')"
+      style="padding: 12px 24px; font-size: 16px; border-radius: 8px; background-color: #f6851b; color: white; border: none; cursor: pointer;"
+    >
+      🔗 Pay with MetaMask (v1)
+    </button>
   </div>
+</div>
+
 	 </div>
 
 <!-- Spinner Overlay -->
