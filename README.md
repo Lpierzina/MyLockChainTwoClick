@@ -16,6 +16,9 @@
 ---
 
 ## ⚙️ Registration Flow
+## 📊 MyLockChain Flow Overview
+
+![MyLockChain Flow Diagram](https://white-payable-angelfish-864.mypinata.cloud/ipfs/bafybeihz4lo3h7qz2qtkqq6lbna43o3f7pablevrjvfxwjvqktrdtkbhwi?pinataGatewayToken=wz1XCejvOunmyvz-8N92kgL1QCs_5GZVAy9v392CMRKuWkEG1mBdtxvRhyYefA5N)
 
 ### Step-by-Step:
 1. **User uploads a file**
